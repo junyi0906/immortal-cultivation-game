@@ -1,1599 +1,906 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>修仙传说</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>修仙游戏 - AI Native</title>
+  <style>
+    /* ==================== 基础样式 ==================== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        body {
-            font-family: 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            color: #fff;
-        }
+    body {
+      font-family: 'Microsoft YaHei', 'SimSun', sans-serif;
+      overflow: hidden;
+      background: #1a1a2e;
+      color: #e0e0e0;
+    }
 
-        #game-container {
-            width: 900px;
-            height: 600px;
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-        }
+    /* ==================== 游戏容器 ==================== */
+    #game-container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    }
 
-        #game-canvas {
-            width: 600px;
-            height: 600px;
-            float: left;
-            background: #1a1a2e;
-        }
+    /* ==================== 游戏画布 ==================== */
+    #game-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
 
-        #ui-panel {
-            width: 300px;
-            height: 600px;
-            float: right;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 20px;
-            overflow-y: auto;
-        }
+    /* ==================== UI 层 ==================== */
+    .ui-layer {
+      position: absolute;
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+    }
 
-        .panel-section {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
+    .ui-layer > * {
+      pointer-events: auto;
+    }
 
-        .panel-title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #f093fb;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding-bottom: 5px;
-        }
+    /* ==================== 顶部状态栏 ==================== */
+    .status-bar {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 10px;
+      border: 1px solid rgba(244, 208, 63, 0.3);
+    }
 
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 5px 0;
-            font-size: 14px;
-        }
+    .status-left {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
 
-        .info-label {
-            color: #aaa;
-        }
+    .status-right {
+      display: flex;
+      gap: 10px;
+    }
 
-        .info-value {
-            color: #fff;
-            font-weight: bold;
-        }
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 14px;
+    }
 
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 5px 0;
-        }
+    .status-label {
+      color: #f4d03f;
+      font-weight: bold;
+    }
 
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            transition: width 0.3s;
-        }
+    .status-value {
+      color: #fff;
+    }
 
-        .btn {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
+    /* ==================== 血条和经验条 ==================== */
+    .bar-container {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 150px;
+    }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-        }
+    .bar {
+      height: 8px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      overflow: hidden;
+    }
 
-        .btn:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 5px rgba(102, 126, 234, 0.3);
-        }
+    .bar-fill {
+      height: 100%;
+      transition: width 0.3s ease;
+      border-radius: 4px;
+    }
 
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
+    .hp-bar .bar-fill {
+      background: linear-gradient(90deg, #c0392b, #e74c3c);
+    }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
+    .exp-bar .bar-fill {
+      background: linear-gradient(90deg, #2980b9, #3498db);
+    }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
+    .bar-text {
+      font-size: 12px;
+      color: #f4d03f;
+    }
 
-        .panel-section {
-            animation: fadeIn 0.3s ease-out;
-        }
+    /* ==================== 底部按钮栏 ==================== */
+    .button-bar {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 10px;
+      border: 1px solid rgba(244, 208, 63, 0.3);
+    }
 
-        #log-panel {
-            margin-top: 10px;
-            max-height: 150px;
-            overflow-y: auto;
-            font-size: 12px;
-            line-height: 1.5;
-        }
+    .game-btn {
+      background: linear-gradient(135deg, #f4d03f 0%, #16a085 100%);
+      color: #1a1a2e;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
 
-        .log-entry {
-            padding: 5px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
+    .game-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    }
 
-        .log-info {
-            color: #4ecdc4;
-        }
+    .game-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
 
-        .log-success {
-            color: #95e1d3;
-        }
+    /* ==================== 模态框 ==================== */
+    .modal {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(26, 26, 46, 0.95);
+      border-radius: 15px;
+      border: 2px solid rgba(244, 208, 63, 0.5);
+      padding: 30px;
+      min-width: 400px;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      display: none;
+      z-index: 1000;
+    }
 
-        .log-warning {
-            color: #fce38a;
-        }
+    .modal.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
 
-        .log-danger {
-            color: #f38181;
-        }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
 
-        #start-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(244, 208, 63, 0.3);
+    }
 
-        #start-screen h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
-            text-shadow: 0 0 20px rgba(102, 126, 234, 0.8);
-        }
+    .modal-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #f4d03f;
+    }
 
-        #start-screen .btn {
-            width: 200px;
-            padding: 15px;
-            font-size: 18px;
-            margin: 10px;
-        }
-    </style>
+    .modal-close {
+      background: #c0392b;
+      color: white;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .modal-close:hover {
+      background: #e74c3c;
+      transform: rotate(90deg);
+    }
+
+    .modal-content {
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+
+    /* ==================== 角色面板 ==================== */
+    .character-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .character-section {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid rgba(244, 208, 63, 0.2);
+    }
+
+    .character-section h3 {
+      color: #f4d03f;
+      margin-bottom: 15px;
+      font-size: 18px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(244, 208, 63, 0.1);
+    }
+
+    .stat-label {
+      color: #f4d03f;
+    }
+
+    .stat-value {
+      color: #fff;
+      font-weight: bold;
+    }
+
+    /* ==================== 对话框 ==================== */
+    .dialog-box {
+      background: rgba(255, 255, 255, 0.95);
+      color: #1a1a2e;
+      padding: 20px;
+      border-radius: 10px;
+      border: 2px solid #f4d03f;
+      max-width: 500px;
+    }
+
+    .dialog-npc {
+      font-weight: bold;
+      color: #f4d03f;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .dialog-text {
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+
+    .dialog-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .dialog-option {
+      background: linear-gradient(135deg, #3498db, #2980b9);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.3s ease;
+    }
+
+    .dialog-option:hover {
+      background: linear-gradient(135deg, #5dade2, #3498db);
+      transform: translateX(5px);
+    }
+
+    /* ==================== 消息提示 ==================== */
+    .toast {
+      position: absolute;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: #f4d03f;
+      padding: 15px 30px;
+      border-radius: 10px;
+      border: 1px solid rgba(244, 208, 63, 0.5);
+      font-size: 16px;
+      font-weight: bold;
+      z-index: 1000;
+      display: none;
+      animation: slideDown 0.3s ease;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    /* ==================== 加载界面 ==================== */
+    .loading-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+
+    .loading-title {
+      font-size: 48px;
+      font-weight: bold;
+      color: #f4d03f;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .loading-bar {
+      width: 300px;
+      height: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .loading-progress {
+      height: 100%;
+      background: linear-gradient(90deg, #f4d03f, #16a085);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .loading-text {
+      margin-top: 20px;
+      color: #f4d03f;
+      font-size: 18px;
+    }
+
+    /* ==================== 滚动条样式 ==================== */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(244, 208, 63, 0.5);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(244, 208, 63, 0.8);
+    }
+
+    /* ==================== 响应式设计 ==================== */
+    @media (max-width: 768px) {
+      .status-bar {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .status-left {
+        flex-wrap: wrap;
+      }
+
+      .button-bar {
+        width: 90%;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .modal {
+        width: 90%;
+        min-width: auto;
+      }
+
+      .character-panel {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div id="game-container">
-        <canvas id="game-canvas" width="600" height="600"></canvas>
+  <!-- 游戏容器 -->
+  <div id="game-container">
+    <!-- 游戏画布 -->
+    <canvas id="game-canvas"></canvas>
 
-        <div id="ui-panel">
-            <div class="panel-section">
-                <div class="panel-title">角色信息</div>
-                <div class="info-row">
-                    <span class="info-label">名字</span>
-                    <span class="info-value" id="character-name">主角</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">职业</span>
-                    <span class="info-value" id="character-class">剑修</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">等级</span>
-                    <span class="info-value" id="level">1</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">生命</span>
-                    <span class="info-value" id="hp">100/100</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="hp-bar" style="width: 100%"></div>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">经验</span>
-                    <span class="info-value" id="exp">0/100</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="exp-bar" style="width: 0%"></div>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">金币</span>
-                    <span class="info-value" id="gold">100</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">攻击</span>
-                    <span class="info-value" id="attack">10</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">防御</span>
-                    <span class="info-value" id="defense">5</span>
-                </div>
+    <!-- UI 层 -->
+    <div class="ui-layer">
+      <!-- 顶部状态栏 -->
+      <div class="status-bar" id="status-bar" style="display: none;">
+        <div class="status-left">
+          <div class="bar-container">
+            <div class="bar hp-bar">
+              <div class="bar-fill" id="hp-bar-fill" style="width: 100%;"></div>
             </div>
-
-            <div class="panel-section">
-                <div class="panel-title">地图信息</div>
-                <div class="info-row">
-                    <span class="info-label">当前地图</span>
-                    <span class="info-value" id="map-name">新手村</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">关卡进度</span>
-                    <span class="info-value" id="level-progress">0/10</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="level-progress-bar" style="width: 0%"></div>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">怪物数量</span>
-                    <span class="info-value" id="monster-count">0</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">等级要求</span>
-                    <span class="info-value" id="map-level">1-5</span>
-                </div>
-                <button class="btn" onclick="prevMap()">← 上一个地图</button>
-                <button class="btn" onclick="nextMap()">下一个地图 →</button>
-                <button class="btn" onclick="talkToNPC()">对话 NPC</button>
+            <div class="bar-text" id="hp-bar-text">HP: 100/100</div>
+          </div>
+          <div class="bar-container">
+            <div class="bar exp-bar">
+              <div class="bar-fill" id="exp-bar-fill" style="width: 0%;"></div>
             </div>
-
-            <div class="panel-section">
-                <div class="panel-title">操作</div>
-                <button class="btn" id="btn-explore" onclick="explore()">探索</button>
-                <button class="btn" id="btn-rest" onclick="rest()">休息</button>
-                <button class="btn" id="btn-shop" onclick="openShop()">商店</button>
-                <button class="btn" id="btn-inventory" onclick="openInventory()">背包</button>
-                <button class="btn" onclick="showQuestModal()">任务</button>
-            </div>
-
-            <div class="panel-section">
-                <div class="panel-title">游戏日志</div>
-                <div id="log-panel"></div>
-            </div>
+            <div class="bar-text" id="exp-bar-text">EXP: 0/100</div>
+          </div>
+          <div class="status-item">
+            <span class="status-label">等级:</span>
+            <span class="status-value" id="level-value">1</span>
+          </div>
+          <div class="status-item">
+            <span class="status-label">金币:</span>
+            <span class="status-value" id="gold-value">0</span>
+          </div>
         </div>
-
-        <div id="start-screen">
-            <h1>修仙传说</h1>
-            <button class="btn" onclick="startGame()">继续游戏</button>
-            <button class="btn" onclick="createNewCharacter()">创建角色</button>
+        <div class="status-right">
+          <div class="status-item">
+            <span class="status-label">地图:</span>
+            <span class="status-value" id="map-value">村庄</span>
+          </div>
         </div>
+      </div>
+
+      <!-- 底部按钮栏 -->
+      <div class="button-bar" id="button-bar" style="display: none;">
+        <button class="game-btn" onclick="openCharacterPanel()">👤 角色</button>
+        <button class="game-btn" onclick="openInventoryPanel()">🎒 背包</button>
+        <button class="game-btn" onclick="openSkillsPanel()">⚔️ 技能</button>
+        <button class="game-btn" onclick="openTasksPanel()">📋 任务</button>
+        <button class="game-btn" onclick="saveGame()">💾 保存</button>
+      </div>
+
+      <!-- 消息提示 -->
+      <div class="toast" id="toast"></div>
     </div>
 
-    <script>
-        // 游戏全局变量
-        const canvas = document.getElementById('game-canvas');
-        const ctx = canvas.getContext('2d');
+    <!-- 角色面板模态框 -->
+    <div class="modal" id="character-modal">
+      <div class="modal-header">
+        <h2 class="modal-title">👤 角色信息</h2>
+        <button class="modal-close" onclick="closeModal('character-modal')">&times;</button>
+      </div>
+      <div class="modal-content">
+        <div class="character-panel" id="character-content">
+          <!-- 动态生成 -->
+        </div>
+      </div>
+    </div>
 
-        let gameState = {
-            started: false,
-            name: '主角',
-            className: '剑修',
-            class: 'swordsman',
-            icon: '⚔️',
-            level: 1,
-            hp: 100,
-            maxHp: 100,
-            mp: 50,
-            maxMp: 50,
-            exp: 0,
-            expToLevel: 100,
-            attack: 10,
-            defense: 5,
-            currentMap: '新手村',
-            monsters: [],
-            gold: 100,
-            skills: [],
-            equipment: {
-                weapon: null,
-                armor: null,
-                accessory: null
-            },
-            inventory: [],
-            activeQuests: [],
-            completedQuests: [],
-            images: {
-                idle: null,
-                attack: null,
-                injured: null,
-                victory: null
-            }
-        };
+    <!-- 背包面板模态框 -->
+    <div class="modal" id="inventory-modal">
+      <div class="modal-header">
+        <h2 class="modal-title">🎒 背包</h2>
+        <button class="modal-close" onclick="closeModal('inventory-modal')">&times;</button>
+      </div>
+      <div class="modal-content" id="inventory-content">
+        <!-- 动态生成 -->
+      </div>
+    </div>
 
-        // 地图数据
-        const maps = {
-            '新手村': {
-                name: '新手村',
-                monsters: [],
-                monsterTypes: ['史莱姆', '兔子'],
-                bgColor: '#2d3748',
-                gridColor: '#4a5568',
-                minLevel: 1,
-                maxLevel: 5,
-                level: 1,
-                monstersDefeated: 0,
-                monstersToDefeat: 10,
-                reward: { gold: 100, exp: 50 },
-                unlocked: true,
-                completed: false
-            },
-            '森林': {
-                name: '森林',
-                monsters: [],
-                monsterTypes: ['狼', '野猪'],
-                bgColor: '#22543d',
-                gridColor: '#2f855a',
-                minLevel: 3,
-                maxLevel: 10,
-                level: 2,
-                monstersDefeated: 0,
-                monstersToDefeat: 20,
-                reward: { gold: 300, exp: 150 },
-                unlocked: false,
-                completed: false
-            },
-            '山洞': {
-                name: '山洞',
-                monsters: [],
-                monsterTypes: ['蝙蝠', '骷髅'],
-                bgColor: '#1a202c',
-                gridColor: '#4a5568',
-                minLevel: 5,
-                maxLevel: 15,
-                level: 3,
-                monstersDefeated: 0,
-                monstersToDefeat: 30,
-                reward: { gold: 500, exp: 300 },
-                unlocked: false,
-                completed: false
-            },
-            '仙山': {
-                name: '仙山',
-                monsters: [],
-                monsterTypes: ['灵兽', '守护兽'],
-                bgColor: '#553c9a',
-                gridColor: '#805ad5',
-                minLevel: 10,
-                maxLevel: 20,
-                level: 4,
-                monstersDefeated: 0,
-                monstersToDefeat: 50,
-                reward: { gold: 1000, exp: 500 },
-                unlocked: false,
-                completed: false
-            }
-        };
+    <!-- 技能面板模态框 -->
+    <div class="modal" id="skills-modal">
+      <div class="modal-header">
+        <h2 class="modal-title">⚔️ 技能</h2>
+        <button class="modal-close" onclick="closeModal('skills-modal')">&times;</button>
+      </div>
+      <div class="modal-content" id="skills-content">
+        <!-- 动态生成 -->
+      </div>
+    </div>
 
-        // 地图列表
-        const mapList = ['新手村', '森林', '山洞', '仙山'];
+    <!-- 任务面板模态框 -->
+    <div class="modal" id="tasks-modal">
+      <div class="modal-header">
+        <h2 class="modal-title">📋 任务</h2>
+        <button class="modal-close" onclick="closeModal('tasks-modal')">&times;</button>
+      </div>
+      <div class="modal-content" id="tasks-content">
+        <!-- 动态生成 -->
+      </div>
+    </div>
 
-        // 当前地图索引
-        let currentMapIndex = 0;
+    <!-- 对话框模态框 -->
+    <div class="modal" id="dialog-modal">
+      <div class="dialog-box">
+        <div class="dialog-npc" id="dialog-npc">NPC 名字</div>
+        <div class="dialog-text" id="dialog-text">对话内容</div>
+        <div class="dialog-options" id="dialog-options">
+          <!-- 动态生成 -->
+        </div>
+      </div>
+    </div>
 
-        // 游戏主循环
-        function gameLoop() {
-            update();
-            draw();
-            requestAnimationFrame(gameLoop);
-        }
+    <!-- 加载界面 -->
+    <div class="loading-screen" id="loading-screen">
+      <h1 class="loading-title">修仙游戏</h1>
+      <div class="loading-bar">
+        <div class="loading-progress" id="loading-progress"></div>
+      </div>
+      <div class="loading-text" id="loading-text">加载中...</div>
+    </div>
+  </div>
 
-        // 更新游戏状态
-        function update() {
-            if (!gameState.started) return;
-            // 添加更新逻辑
-        }
+  <script type="module">
+    import coordinatorAPI from './js/coordinator-api.js';
 
-        // 绘制游戏画面
-        function draw() {
-            ctx.fillStyle = '#1a1a2e';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // 全局变量
+    let gameState = null;
+    let canvas = null;
+    let ctx = null;
 
-            if (!gameState.started) return;
+    // 初始化游戏
+    async function initGame() {
+      try {
+        showLoading('初始化游戏...', 10);
 
-            // 绘制地图背景
-            drawMap();
+        // 初始化协调 Agent
+        gameState = await coordinatorAPI.initGame();
 
-            // 绘制怪物
-            drawMonsters();
+        showLoading('加载资源...', 30);
 
-            // 绘制角色
-            drawPlayer();
-        }
+        // 初始化画布
+        canvas = document.getElementById('game-canvas');
+        ctx = canvas.getContext('2d');
+        resizeCanvas();
 
-        // 绘制地图
-        function drawMap() {
-            const map = maps[gameState.currentMap];
-            ctx.fillStyle = map.bgColor;
-            ctx.fillRect(50, 50, 500, 500);
+        showLoading('准备游戏...', 60);
 
-            // 绘制网格
-            ctx.strokeStyle = map.gridColor;
-            ctx.lineWidth = 1;
-            for (let i = 0; i <= 5; i++) {
-                ctx.beginPath();
-                ctx.moveTo(50 + i * 100, 50);
-                ctx.lineTo(50 + i * 100, 550);
-                ctx.stroke();
-
-                ctx.beginPath();
-                ctx.moveTo(50, 50 + i * 100);
-                ctx.lineTo(550, 50 + i * 100);
-                ctx.stroke();
-            }
-
-            // 绘制地图名称
-            ctx.fillStyle = '#fff';
-            ctx.font = '20px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText(map.name, 300, 35);
-        }
-
-        // 切换地图
-        function switchMap(mapName) {
-            const map = maps[mapName];
-
-            // 检查地图是否解锁
-            if (!map.unlocked) {
-                addLog(`该地图尚未解锁！`, 'danger');
-                return;
-            }
-
-            // 检查等级限制
-            if (gameState.level < map.minLevel) {
-                addLog(`等级不足！需要等级 ${map.minLevel} 才能进入${mapName}`, 'danger');
-                return;
-            }
-
-            // 清空当前地图怪物
-            maps[gameState.currentMap].monsters = [];
-
-            // 切换地图
-            gameState.currentMap = mapName;
-            gameState.monsters = [];
-
-            // 生成新怪物
-            spawnMonsters();
-
-            addLog(`进入${mapName}`, 'info');
-            addLog(`关卡进度：${map.monstersDefeated}/${map.monstersToDefeat}`, 'info');
-            updateUI();
-            saveGame();
-        }
-
-        // 解锁地图
-        function unlockMap(mapName) {
-            maps[mapName].unlocked = true;
-            addLog(`解锁新地图：${mapName}！`, 'success');
-            saveGame();
-        }
-
-        // 完成关卡
-        function completeLevel(mapName) {
-            const map = maps[mapName];
-
-            if (map.completed) {
-                return;
-            }
-
-            map.completed = true;
-
-            // 给予奖励
-            gainExp(map.reward.exp);
-            gainGold(map.reward.gold);
-
-            addLog(`关卡 ${map.level} 完成！`, 'success');
-            addLog(`获得奖励：金币 ${map.reward.gold}，经验 ${map.reward.exp}`, 'success');
-
-            // 解锁下一张地图
-            const nextMapIndex = mapList.indexOf(mapName) + 1;
-            if (nextMapIndex < mapList.length) {
-                unlockMap(mapList[nextMapIndex]);
-            }
-
-            saveGame();
-        }
-
-        // 检查关卡进度
-        function checkLevelProgress() {
-            const map = maps[gameState.currentMap];
-
-            if (!map.completed && map.monstersDefeated >= map.monstersToDefeat) {
-                completeLevel(gameState.currentMap);
-            }
-        }
-
-        // 下一个地图
-        function nextMap() {
-            currentMapIndex = (currentMapIndex + 1) % mapList.length;
-            switchMap(mapList[currentMapIndex]);
-        }
-
-        // 上一个地图
-        function prevMap() {
-            currentMapIndex = (currentMapIndex - 1 + mapList.length) % mapList.length;
-            switchMap(mapList[currentMapIndex]);
-        }
-
-        // 绘制怪物
-        function drawMonsters() {
-            gameState.monsters.forEach(monster => {
-                ctx.fillStyle = monster.color || '#ff6b6b';
-                ctx.beginPath();
-                ctx.arc(monster.x, monster.y, 15, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#fff';
-                ctx.font = '12px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText(monster.name, monster.x, monster.y - 20);
-                ctx.fillText(`Lv.${monster.level}`, monster.x, monster.y - 35);
-            });
-        }
-
-        // 怪物数据
-        const monsterTypes = {
-            '史莱姆': { hp: 30, attack: 5, defense: 2, exp: 10, gold: 5, color: '#68d391' },
-            '兔子': { hp: 40, attack: 8, defense: 3, exp: 15, gold: 8, color: '#fff5f5' },
-            '狼': { hp: 60, attack: 12, defense: 5, exp: 25, gold: 15, color: '#a0aec0' },
-            '野猪': { hp: 80, attack: 15, defense: 8, exp: 35, gold: 20, color: '#c05621' },
-            '蝙蝠': { hp: 50, attack: 18, defense: 4, exp: 40, gold: 25, color: '#805ad5' },
-            '骷髅': { hp: 100, attack: 22, defense: 10, exp: 50, gold: 30, color: '#e2e8f0' },
-            '灵兽': { hp: 150, attack: 30, defense: 15, exp: 80, gold: 50, color: '#4fd1c5' },
-            '守护兽': { hp: 200, attack: 40, defense: 20, exp: 120, gold: 80, color: '#f687b3' }
-        };
-
-        // 生成怪物
-        function spawnMonsters() {
-            const map = maps[gameState.currentMap];
-            gameState.monsters = [];
-
-            const monsterCount = Math.floor(Math.random() * 3) + 3; // 3-5 个怪物
-
-            for (let i = 0; i < monsterCount; i++) {
-                const monsterTypeName = map.monsterTypes[Math.floor(Math.random() * map.monsterTypes.length)];
-                const monsterType = monsterTypes[monsterTypeName];
-                const monsterLevel = map.minLevel + Math.floor(Math.random() * (map.maxLevel - map.minLevel));
-
-                gameState.monsters.push({
-                    name: monsterTypeName,
-                    level: monsterLevel,
-                    hp: monsterType.hp + (monsterLevel - 1) * 10,
-                    maxHp: monsterType.hp + (monsterLevel - 1) * 10,
-                    attack: monsterType.attack + (monsterLevel - 1) * 3,
-                    defense: monsterType.defense + (monsterLevel - 1) * 2,
-                    exp: monsterType.exp + (monsterLevel - 1) * 5,
-                    gold: monsterType.gold + (monsterLevel - 1) * 3,
-                    color: monsterType.color,
-                    x: 100 + Math.random() * 400,
-                    y: 100 + Math.random() * 400
-                });
-            }
-
-            updateUI();
-        }
-
-        // 探索怪物
-        function explore() {
-            if (!gameState.started) return;
-
-            if (gameState.monsters.length === 0) {
-                addLog('当前地图没有怪物，正在生成新怪物...', 'info');
-                spawnMonsters();
-                return;
-            }
-
-            // 随机选择一个怪物进入战斗
-            const monsterIndex = Math.floor(Math.random() * gameState.monsters.length);
-            const monster = gameState.monsters[monsterIndex];
-
-            addLog(`发现了 ${monster.name}（Lv.${monster.level}）！`, 'warning');
-            addLog(`生命：${monster.hp} | 攻击：${monster.attack} | 防御：${monster.defense}`, 'info');
-
-            startBattle(monsterIndex);
-        }
-
-        // 绘制角色
-        function drawPlayer() {
-            ctx.fillStyle = '#4ecdc4';
-            ctx.beginPath();
-            ctx.arc(300, 300, 20, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.fillStyle = '#fff';
-            ctx.font = '14px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('主角', 300, 340);
-        }
+        // 显示 UI
+        document.getElementById('status-bar').style.display = 'flex';
+        document.getElementById('button-bar').style.display = 'flex';
 
         // 更新 UI
-        function updateUI() {
-            document.getElementById('character-name').textContent = gameState.name;
-            document.getElementById('character-class').textContent = gameState.className;
-            document.getElementById('level').textContent = gameState.level;
-            document.getElementById('hp').textContent = `${gameState.hp}/${gameState.maxHp}`;
-            document.getElementById('exp').textContent = `${gameState.exp}/${gameState.expToLevel}`;
-            document.getElementById('gold').textContent = gameState.gold;
-            document.getElementById('attack').textContent = gameState.attack;
-            document.getElementById('defense').textContent = gameState.defense;
-            document.getElementById('map-name').textContent = gameState.currentMap;
-            document.getElementById('monster-count').textContent = gameState.monsters.length;
+        updateUI();
 
-            const currentMap = maps[gameState.currentMap];
-            document.getElementById('map-level').textContent = `${currentMap.minLevel}-${currentMap.maxLevel}`;
-            document.getElementById('level-progress').textContent = `${currentMap.monstersDefeated}/${currentMap.monstersToDefeat}`;
-            document.getElementById('level-progress-bar').style.width = `${(currentMap.monstersDefeated / currentMap.monstersToDefeat) * 100}%`;
+        showLoading('完成!', 100);
 
-            // 更新进度条
-            document.getElementById('hp-bar').style.width = `${(gameState.hp / gameState.maxHp) * 100}%`;
-            document.getElementById('exp-bar').style.width = `${(gameState.exp / gameState.expToLevel) * 100}%`;
+        // 隐藏加载界面
+        setTimeout(() => {
+          hideLoading();
+        }, 500);
+
+        // 开始游戏循环
+        gameLoop();
+      } catch (error) {
+        console.error('初始化失败:', error);
+        showToast('初始化失败: ' + error.message);
+      }
+    }
+
+    // 调整画布大小
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    // 游戏循环
+    function gameLoop() {
+      update();
+      render();
+      requestAnimationFrame(gameLoop);
+    }
+
+    // 更新逻辑
+    function update() {
+      // 游戏逻辑更新
+    }
+
+    // 渲染
+    function render() {
+      // 清空画布
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // 渲染游戏场景
+      renderScene();
+    }
+
+    // 渲染场景
+    function renderScene() {
+      // 绘制背景
+      ctx.fillStyle = '#1a1a2e';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // 绘制玩家位置
+      if (gameState && gameState.player && gameState.player.position) {
+        const pos = gameState.player.position;
+
+        // 绘制玩家
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, 20, 0, Math.PI * 2);
+        ctx.fillStyle = '#f4d03f';
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // 绘制名字
+        ctx.fillStyle = '#fff';
+        ctx.font = '16px Microsoft YaHei';
+        ctx.textAlign = 'center';
+        ctx.fillText(gameState.player.name || '玩家', pos.x, pos.y - 30);
+      }
+    }
+
+    // 更新 UI
+    function updateUI() {
+      if (!gameState || !gameState.player) return;
+
+      const player = gameState.player;
+
+      // 更新血条
+      const hpPercent = (player.hp / player.maxHp) * 100;
+      document.getElementById('hp-bar-fill').style.width = hpPercent + '%';
+      document.getElementById('hp-bar-text').textContent = `HP: ${player.hp}/${player.maxHp}`;
+
+      // 更新经验条
+      const expPercent = (player.exp / player.expToNextLevel) * 100;
+      document.getElementById('exp-bar-fill').style.width = expPercent + '%';
+      document.getElementById('exp-bar-text').textContent = `EXP: ${player.exp}/${player.expToNextLevel}`;
+
+      // 更新等级和金币
+      document.getElementById('level-value').textContent = player.level;
+      document.getElementById('gold-value').textContent = player.gold;
+
+      // 更新地图
+      const mapNames = {
+        'village': '村庄',
+        'forest': '森林',
+        'cave': '山洞',
+        'desert': '沙漠',
+        'snow': '冰原',
+        'volcano': '火山',
+        'demon_palace': '魔宫'
+      };
+      document.getElementById('map-value').textContent = mapNames[gameState.currentMap] || gameState.currentMap;
+    }
+
+    // 打开角色面板
+    window.openCharacterPanel = function() {
+      if (!gameState || !gameState.player) return;
+
+      const player = gameState.player;
+      const content = document.getElementById('character-content');
+
+      content.innerHTML = `
+        <div class="character-section">
+          <h3>👤 基本信息</h3>
+          <div class="stat-row">
+            <span class="stat-label">名字:</span>
+            <span class="stat-value">${player.name || '未命名'}</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">职业:</span>
+            <span class="stat-value">${player.class || '未选择'}</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">等级:</span>
+            <span class="stat-value">${player.level}</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">经验:</span>
+            <span class="stat-value">${player.exp}/${player.expToNextLevel}</span>
+          </div>
+        </div>
+        <div class="character-section">
+          <h3>⚔️ 战斗属性</h3>
+          <div class="stat-row">
+            <span class="stat-label">生命值:</span>
+            <span class="stat-value">${player.hp}/${player.maxHp}</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">攻击力:</span>
+            <span class="stat-value">${player.attack}</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">防御力:</span>
+            <span class="stat-value">${player.defense}</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">金币:</span>
+            <span class="stat-value">${player.gold}</span>
+          </div>
+        </div>
+      `;
+
+      openModal('character-modal');
+    };
+
+    // 打开背包面板
+    window.openInventoryPanel = function() {
+      const content = document.getElementById('inventory-content');
+
+      if (!gameState || gameState.inventory.length === 0) {
+        content.innerHTML = '<p style="text-align: center; color: #999;">背包是空的</p>';
+      } else {
+        content.innerHTML = gameState.inventory.map((item, index) => `
+          <div class="character-section" style="margin-bottom: 10px;">
+            <div class="stat-row">
+              <span class="stat-label">名称:</span>
+              <span class="stat-value">${item.name}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">数量:</span>
+              <span class="stat-value">${item.quantity}</span>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      openModal('inventory-modal');
+    };
+
+    // 打开技能面板
+    window.openSkillsPanel = function() {
+      const content = document.getElementById('skills-content');
+
+      if (!gameState || gameState.skills.length === 0) {
+        content.innerHTML = '<p style="text-align: center; color: #999;">还没有学习技能</p>';
+      } else {
+        content.innerHTML = gameState.skills.map((skill, index) => `
+          <div class="character-section" style="margin-bottom: 10px;">
+            <div class="stat-row">
+              <span class="stat-label">名称:</span>
+              <span class="stat-value">${skill.name}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">等级:</span>
+              <span class="stat-value">${skill.level}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">描述:</span>
+              <span class="stat-value">${skill.description}</span>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      openModal('skills-modal');
+    };
+
+    // 打开任务面板
+    window.openTasksPanel = function() {
+      const content = document.getElementById('tasks-content');
+
+      if (!gameState || gameState.tasks.length === 0) {
+        content.innerHTML = '<p style="text-align: center; color: #999;">还没有任务</p>';
+      } else {
+        content.innerHTML = gameState.tasks.map((task, index) => `
+          <div class="character-section" style="margin-bottom: 10px;">
+            <div class="stat-row">
+              <span class="stat-label">任务:</span>
+              <span class="stat-value">${task.title}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">状态:</span>
+              <span class="stat-value" style="color: ${task.completed ? '#27ae60' : '#e74c3c'};">
+                ${task.completed ? '已完成' : '进行中'}
+              </span>
+            </div>
+            ${task.completed && task.rewards ? `
+              <div class="stat-row">
+                <span class="stat-label">奖励:</span>
+                <span class="stat-value">金币 ${task.rewards.gold}, 经验 ${task.rewards.exp}</span>
+              </div>
+            ` : ''}
+          </div>
+        `).join('');
+      }
+
+      openModal('tasks-modal');
+    };
+
+    // 保存游戏
+    window.saveGame = async function() {
+      try {
+        const success = await coordinatorAPI.saveGame();
+        if (success) {
+          showToast('游戏已保存');
+        } else {
+          showToast('保存失败');
         }
-
-        // 添加日志
-        function addLog(message, type = 'info') {
-            const logPanel = document.getElementById('log-panel');
-            const logEntry = document.createElement('div');
-            logEntry.className = `log-entry log-${type}`;
-            logEntry.textContent = message;
-            logPanel.insertBefore(logEntry, logPanel.firstChild);
-
-            // 限制日志数量
-            if (logPanel.children.length > 20) {
-                logPanel.removeChild(logPanel.lastChild);
-            }
-        }
-
-        // 开始游戏
-        function startGame() {
-            // 检查是否有角色数据
-            const character = localStorage.getItem('character');
-            if (!character) {
-                // 没有角色，跳转到角色创建页面
-                window.location.href = 'character-creation.html';
-                return;
-            }
-
-            // 加载角色数据
-            loadCharacter();
-
-            gameState.started = true;
-            document.getElementById('start-screen').style.display = 'none';
-            addLog('欢迎来到修仙世界！', 'success');
-            addLog(`当前角色：${gameState.name}（${gameState.className}）`, 'info');
-            addLog('当前地图：新手村', 'info');
-            addLog('点击"探索"开始冒险', 'info');
-            updateStats();
-            spawnMonsters();
-            updateUI();
-            gameLoop();
-        }
-
-        // 创建新角色
-        function createNewCharacter() {
-            window.location.href = 'character-creation.html';
-        }
-
-        // 加载角色数据
-        function loadCharacter() {
-            const characterStr = localStorage.getItem('character');
-            if (!characterStr) return;
-
-            const character = JSON.parse(characterStr);
-
-            gameState.name = character.name;
-            gameState.className = character.className;
-            gameState.class = character.class;
-            gameState.icon = character.icon;
-            gameState.level = character.level;
-            gameState.exp = character.exp;
-            gameState.expToLevel = character.expToLevel;
-            gameState.hp = character.hp;
-            gameState.maxHp = character.maxHp;
-            gameState.mp = character.mp;
-            gameState.maxMp = character.maxMp;
-            gameState.attack = character.attack;
-            gameState.defense = character.defense;
-            gameState.gold = character.gold;
-            gameState.images = character.images;
-        }
-
-        // 战斗状态
-        let battleState = {
-            active: false,
-            monsterIndex: -1,
-            turn: 'player',
-            log: []
-        };
-
-        // 开始战斗
-        function startBattle(monsterIndex) {
-            const monster = gameState.monsters[monsterIndex];
-
-            battleState.active = true;
-            battleState.monsterIndex = monsterIndex;
-            battleState.turn = 'player';
-            battleState.log = [];
-
-            addLog('--- 战斗开始 ---', 'info');
-            addLog(`主角 VS ${monster.name}`, 'info');
-        }
-
-        // 玩家攻击
-        function playerAttack() {
-            if (!battleState.active || battleState.turn !== 'player') return;
-
-            const monster = gameState.monsters[battleState.monsterIndex];
-            const damage = Math.max(1, gameState.attack - monster.defense);
-
-            monster.hp -= damage;
-            addLog(`你对 ${monster.name} 造成 ${damage} 点伤害！`, 'success');
-
-            if (monster.hp <= 0) {
-                battleVictory();
-            } else {
-                addLog(`${monster.name} 剩余生命：${monster.hp}`, 'info');
-                battleState.turn = 'monster';
-                setTimeout(monsterAttack, 1000);
-            }
-        }
-
-        // 怪物攻击
-        function monsterAttack() {
-            if (!battleState.active) return;
-
-            const monster = gameState.monsters[battleState.monsterIndex];
-            const damage = Math.max(1, monster.attack - gameState.defense);
-
-            gameState.hp -= damage;
-            addLog(`${monster.name} 对你造成 ${damage} 点伤害！`, 'danger');
-
-            if (gameState.hp <= 0) {
-                gameState.hp = 0;
-                battleDefeat();
-            } else {
-                addLog(`你剩余生命：${gameState.hp}`, 'info');
-                battleState.turn = 'player';
-            }
-
-            updateUI();
-        }
-
-        // 战斗胜利
-        function battleVictory() {
-            const monster = gameState.monsters[battleState.monsterIndex];
-
-            addLog(`击败了 ${monster.name}！`, 'success');
-            addLog(`获得经验：${monster.exp}，金币：${monster.gold}`, 'success');
-
-            gainExp(monster.exp);
-            gainGold(monster.gold);
-
-            // 更新任务进度
-            updateQuestProgress(monster.name);
-
-            // 更新关卡进度
-            const map = maps[gameState.currentMap];
-            map.monstersDefeated++;
-            checkLevelProgress();
-
-            // 移除怪物
-            gameState.monsters.splice(battleState.monsterIndex, 1);
-            battleState.active = false;
-            battleState.monsterIndex = -1;
-
-            addLog('--- 战斗结束 ---', 'info');
-            updateUI();
-        }
-
-        // 战斗失败
-        function battleDefeat() {
-            addLog('你被打败了...', 'danger');
-            addLog('生命值已清空，请休息恢复', 'warning');
-
-            battleState.active = false;
-            battleState.monsterIndex = -1;
-
-            addLog('--- 战斗结束 ---', 'info');
-        }
-
-        // 探索
-        function explore() {
-            if (!gameState.started) return;
-
-            if (gameState.hp <= gameState.maxHp * 0.2) {
-                addLog('生命值过低，请先休息恢复！', 'danger');
-                return;
-            }
-
-            if (battleState.active) {
-                playerAttack();
-                return;
-            }
-
-            if (gameState.monsters.length === 0) {
-                addLog('当前地图没有怪物，正在生成新怪物...', 'info');
-                spawnMonsters();
-                return;
-            }
-
-            // 随机选择一个怪物进入战斗
-            const monsterIndex = Math.floor(Math.random() * gameState.monsters.length);
-            const monster = gameState.monsters[monsterIndex];
-
-            addLog(`发现了 ${monster.name}（Lv.${monster.level}）！`, 'warning');
-            addLog(`生命：${monster.hp} | 攻击：${monster.attack} | 防御：${monster.defense}`, 'info');
-
-            startBattle(monsterIndex);
-        }
-
-        // 休息
-        function rest() {
-            if (!gameState.started) return;
-            gameState.hp = gameState.maxHp;
-            addLog('休息恢复，生命值已满', 'success');
-            updateUI();
-        }
-
-        // 打开商店
-        function openShop() {
-            if (!gameState.started) return;
-            showShopModal();
-        }
-
-        // 背包
-        const items = {
-            // 武器
-            '木剑': { type: 'weapon', attack: 5, price: 50, quality: 'common' },
-            '铁剑': { type: 'weapon', attack: 15, price: 150, quality: 'uncommon' },
-            '钢剑': { type: 'weapon', attack: 30, price: 400, quality: 'rare' },
-            '神剑': { type: 'weapon', attack: 60, price: 1000, quality: 'legendary' },
-            // 护甲
-            '布甲': { type: 'armor', defense: 5, price: 50, quality: 'common' },
-            '铁甲': { type: 'armor', defense: 15, price: 150, quality: 'uncommon' },
-            '钢甲': { type: 'armor', defense: 30, price: 400, quality: 'rare' },
-            '神甲': { type: 'armor', defense: 60, price: 1000, quality: 'legendary' },
-            // 饰品
-            '草戒指': { type: 'accessory', attack: 2, defense: 2, price: 80, quality: 'common' },
-            '铁戒指': { type: 'accessory', attack: 6, defense: 6, price: 200, quality: 'uncommon' },
-            '金戒指': { type: 'accessory', attack: 12, defense: 12, price: 500, quality: 'rare' },
-            '神戒': { type: 'accessory', attack: 25, defense: 25, price: 1200, quality: 'legendary' }
-        };
-
-        // 装备
-        function equipItem(itemName) {
-            const item = items[itemName];
-            if (!item) return;
-
-            // 卸下当前装备
-            const currentEquip = gameState.equipment[item.type];
-            if (currentEquip) {
-                gameState.inventory.push(currentEquip);
-            }
-
-            // 装备新物品
-            gameState.equipment[item.type] = itemName;
-
-            // 从背包移除
-            const inventoryIndex = gameState.inventory.indexOf(itemName);
-            if (inventoryIndex > -1) {
-                gameState.inventory.splice(inventoryIndex, 1);
-            }
-
-            // 更新属性
-            updateStats();
-
-            addLog(`装备了 ${itemName}`, 'success');
-            updateUI();
-            saveGame();
-            showInventoryModal();
-        }
-
-        // 卸下装备
-        function unequipItem(type) {
-            const currentEquip = gameState.equipment[type];
-            if (!currentEquip) return;
-
-            gameState.inventory.push(currentEquip);
-            gameState.equipment[type] = null;
-
-            updateStats();
-            addLog(`卸下了 ${currentEquip}`, 'info');
-            updateUI();
-            saveGame();
-            showInventoryModal();
-        }
-
-        // 更新属性
-        function updateStats() {
-            // 基础属性
-            let baseAttack = 10 + (gameState.level - 1) * 5;
-            let baseDefense = 5 + (gameState.level - 1) * 3;
-
-            // 装备加成
-            Object.values(gameState.equipment).forEach(itemName => {
-                if (itemName && items[itemName]) {
-                    const item = items[itemName];
-                    const enhancement = getEnhancementLevel(itemName);
-                    if (item.attack) baseAttack += item.attack + item.attack * enhancement * 0.2;
-                    if (item.defense) baseDefense += item.defense + item.defense * enhancement * 0.2;
-                }
-            });
-
-            gameState.attack = Math.floor(baseAttack);
-            gameState.defense = Math.floor(baseDefense);
-        }
-
-        // 背包界面
-        function openInventory() {
-            if (!gameState.started) return;
-            showInventoryModal();
-        }
-
-        // 购买物品
-        function buyItem(itemName) {
-            const item = items[itemName];
-            if (!item) return;
-
-            if (gameState.gold < item.price) {
-                addLog('金币不足！', 'danger');
-                return;
-            }
-
-            gameState.gold -= item.price;
-            gameState.inventory.push(itemName);
-
-            addLog(`购买了 ${itemName}`, 'success');
-            updateUI();
-            saveGame();
-            showShopModal();
-        }
-
-        // 显示商店弹窗
-        function showShopModal() {
-            const shopItems = Object.keys(items);
-            let shopHTML = `
-                <div id="shop-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 200;">
-                    <div style="background: rgba(0,0,0,0.95); padding: 30px; border-radius: 15px; border: 2px solid rgba(255,255,255,0.2); max-width: 500px; max-height: 500px; overflow-y: auto;">
-                        <h2 style="color: #f093fb; margin-bottom: 20px;">商店</h2>
-                        <p style="color: #aaa; margin-bottom: 20px;">当前金币：${gameState.gold}</p>
-                        <div style="margin-bottom: 20px;">
-                            <h3 style="color: #4ecdc4; margin-bottom: 10px;">武器</h3>
-                            ${shopItems.filter(name => items[name].type === 'weapon').map(name => `
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                                    <div>
-                                        <div style="color: #fff; font-weight: bold;">${name}</div>
-                                        <div style="color: #aaa; font-size: 12px;">攻击 +${items[name].attack}</div>
-                                    </div>
-                                    <button class="btn" style="width: 80px;" onclick="buyItem('${name}')">${items[name].price}G</button>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <div style="margin-bottom: 20px;">
-                            <h3 style="color: #4ecdc4; margin-bottom: 10px;">护甲</h3>
-                            ${shopItems.filter(name => items[name].type === 'armor').map(name => `
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                                    <div>
-                                        <div style="color: #fff; font-weight: bold;">${name}</div>
-                                        <div style="color: #aaa; font-size: 12px;">防御 +${items[name].defense}</div>
-                                    </div>
-                                    <button class="btn" style="width: 80px;" onclick="buyItem('${name}')">${items[name].price}G</button>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <div style="margin-bottom: 20px;">
-                            <h3 style="color: #4ecdc4; margin-bottom: 10px;">饰品</h3>
-                            ${shopItems.filter(name => items[name].type === 'accessory').map(name => `
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                                    <div>
-                                        <div style="color: #fff; font-weight: bold;">${name}</div>
-                                        <div style="color: #aaa; font-size: 12px;">攻+${items[name].attack} 防+${items[name].defense}</div>
-                                    </div>
-                                    <button class="btn" style="width: 80px;" onclick="buyItem('${name}')">${items[name].price}G</button>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <button class="btn" onclick="document.getElementById('shop-modal').remove()">关闭</button>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', shopHTML);
-        }
-
-        // 显示背包弹窗
-        function showInventoryModal() {
-            let inventoryHTML = `
-                <div id="inventory-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 200;">
-                    <div style="background: rgba(0,0,0,0.95); padding: 30px; border-radius: 15px; border: 2px solid rgba(255,255,255,0.2); max-width: 500px; max-height: 500px; overflow-y: auto;">
-                        <h2 style="color: #f093fb; margin-bottom: 20px;">背包</h2>
-                        <div style="margin-bottom: 20px;">
-                            <h3 style="color: #4ecdc4; margin-bottom: 10px;">已装备</h3>
-                            ${gameState.equipment.weapon ? `<div style="margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;"><div style="color: #fff; font-weight: bold;">${gameState.equipment.weapon} (+${getEnhancementLevel(gameState.equipment.weapon)})</div><button class="btn" style="width: 80px; margin-top: 10px;" onclick="unequipItem('weapon')">卸下</button></div>` : '<div style="color: #aaa; margin: 10px 0;">空</div>'}
-                            ${gameState.equipment.armor ? `<div style="margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;"><div style="color: #fff; font-weight: bold;">${gameState.equipment.armor} (+${getEnhancementLevel(gameState.equipment.armor)})</div><button class="btn" style="width: 80px; margin-top: 10px;" onclick="unequipItem('armor')">卸下</button></div>` : '<div style="color: #aaa; margin: 10px 0;">空</div>'}
-                            ${gameState.equipment.accessory ? `<div style="margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;"><div style="color: #fff; font-weight: bold;">${gameState.equipment.accessory} (+${getEnhancementLevel(gameState.equipment.accessory)})</div><button class="btn" style="width: 80px; margin-top: 10px;" onclick="unequipItem('accessory')">卸下</button></div>` : '<div style="color: #aaa; margin: 10px 0;">空</div>'}
-                        </div>
-                        <div style="margin-bottom: 20px;">
-                            <h3 style="color: #4ecdc4; margin-bottom: 10px;">背包物品</h3>
-                            ${gameState.inventory.length > 0 ? gameState.inventory.map(name => `
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                                    <div>
-                                        <div style="color: #fff; font-weight: bold;">${name}</div>
-                                        <div style="color: #aaa; font-size: 12px;">${items[name].type === 'weapon' ? '攻击' : items[name].type === 'armor' ? '防御' : '饰品'} +${items[name].attack || items[name].defense}</div>
-                                    </div>
-                                    <button class="btn" style="width: 80px;" onclick="equipItem('${name}')">装备</button>
-                                </div>
-                            `).join('') : '<div style="color: #aaa; margin: 10px 0;">背包为空</div>'}
-                        </div>
-                        <button class="btn" onclick="showCraftModal()">合成</button>
-                        <button class="btn" onclick="showEnhanceModal()">强化</button>
-                        <button class="btn" onclick="showSkillModal()">技能</button>
-                        <button class="btn" onclick="document.getElementById('inventory-modal').remove()">关闭</button>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', inventoryHTML);
-        }
-
-        // 合成配方
-        const recipes = {
-            '铁剑': ['木剑', '木剑'],
-            '钢剑': ['铁剑', '铁剑'],
-            '神剑': ['钢剑', '钢剑'],
-            '铁甲': ['布甲', '布甲'],
-            '钢甲': ['铁甲', '铁甲'],
-            '神甲': ['钢甲', '钢甲'],
-            '铁戒指': ['草戒指', '草戒指'],
-            '金戒指': ['铁戒指', '铁戒指'],
-            '神戒': ['金戒指', '金戒指']
-        };
-
-        // 合成装备
-        function craftItem(resultItem) {
-            const ingredients = recipes[resultItem];
-
-            // 检查材料
-            for (const ingredient of ingredients) {
-                const index = gameState.inventory.indexOf(ingredient);
-                if (index === -1) {
-                    addLog('材料不足！', 'danger');
-                    return;
-                }
-            }
-
-            // 移除材料
-            for (const ingredient of ingredients) {
-                const index = gameState.inventory.indexOf(ingredient);
-                gameState.inventory.splice(index, 1);
-            }
-
-            // 添加结果
-            gameState.inventory.push(resultItem);
-
-            addLog(`合成成功！获得 ${resultItem}`, 'success');
-            saveGame();
-            showCraftModal();
-        }
-
-        // 显示合成弹窗
-        function showCraftModal() {
-            let craftHTML = `
-                <div id="craft-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 200;">
-                    <div style="background: rgba(0,0,0,0.95); padding: 30px; border-radius: 15px; border: 2px solid rgba(255,255,255,0.2); max-width: 500px; max-height: 500px; overflow-y: auto;">
-                        <h2 style="color: #f093fb; margin-bottom: 20px;">合成</h2>
-                        ${Object.keys(recipes).map(resultItem => `
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                                <div>
-                                    <div style="color: #fff; font-weight: bold;">${resultItem}</div>
-                                    <div style="color: #aaa; font-size: 12px;">材料：${recipes[resultItem].join(' + ')}</div>
-                                </div>
-                                <button class="btn" style="width: 80px;" onclick="craftItem('${resultItem}')">合成</button>
-                            </div>
-                        `).join('')}
-                        <button class="btn" onclick="document.getElementById('craft-modal').remove(); showInventoryModal();">返回</button>
-                    </div>
-                </div>
-            `;
-            document.getElementById('inventory-modal').remove();
-            document.body.insertAdjacentHTML('beforeend', craftHTML);
-        }
-
-        // 装备强化
-        const enhancements = {}; // 装备强化等级
-
-        function getEnhancementLevel(itemName) {
-            return enhancements[itemName] || 0;
-        }
-
-        function enhanceItem(itemName) {
-            const currentLevel = getEnhancementLevel(itemName);
-            const cost = 100 * (currentLevel + 1);
-
-            if (gameState.gold < cost) {
-                addLog('金币不足！', 'danger');
-                return;
-            }
-
-            gameState.gold -= cost;
-            enhancements[itemName] = currentLevel + 1;
-
-            addLog(`${itemName} 强化成功！当前等级：${enhancements[itemName]}`, 'success');
-            updateStats();
-            updateUI();
-            saveGame();
-            showEnhanceModal();
-        }
-
-        function showEnhanceModal() {
-            let enhanceHTML = `
-                <div id="enhance-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 200;">
-                    <div style="background: rgba(0,0,0,0.95); padding: 30px; border-radius: 15px; border: 2px solid rgba(255,255,255,0.2); max-width: 500px; max-height: 500px; overflow-y: auto;">
-                        <h2 style="color: #f093fb; margin-bottom: 20px;">强化</h2>
-                        <p style="color: #aaa; margin-bottom: 20px;">当前金币：${gameState.gold}</p>
-                        ${Object.keys(items).map(itemName => `
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                                <div>
-                                    <div style="color: #fff; font-weight: bold;">${itemName} +${getEnhancementLevel(itemName)}</div>
-                                    <div style="color: #aaa; font-size: 12px;">强化费用：${100 * (getEnhancementLevel(itemName) + 1)}G</div>
-                                </div>
-                                <button class="btn" style="width: 80px;" onclick="enhanceItem('${itemName}')">强化</button>
-                            </div>
-                        `).join('')}
-                        <button class="btn" onclick="document.getElementById('enhance-modal').remove()">关闭</button>
-                    </div>
-                </div>
-            `;
-            document.getElementById('inventory-modal').remove();
-            document.body.insertAdjacentHTML('beforeend', enhanceHTML);
-        }
-
-        // 技能系统
-        const skillData = {
-            '火球术': { damage: 30, mpCost: 10, levelReq: 1, attackBonus: 20 },
-            '冰冻术': { damage: 40, mpCost: 15, levelReq: 3, attackBonus: 30 },
-            '雷击': { damage: 60, mpCost: 25, levelReq: 5, attackBonus: 50 },
-            '治愈术': { heal: 50, mpCost: 20, levelReq: 3, healBonus: 40 }
-        };
-
-        // NPC 系统
-        const npcData = {
-            '新手村': [
-                {
-                    name: '村长',
-                    avatar: '👴',
-                    dialogues: [
-                        { text: '年轻人，欢迎来到新手村！这里很安全，你可以在这里练习战斗。', action: null },
-                        { text: '想变强的话，多去打怪升级吧！', action: null },
-                        { text: '有什么可以帮助你的吗？', action: 'quest1' }
-                    ],
-                    quests: {
-                        'quest1': {
-                            title: '初次试炼',
-                            description: '击败 3 只史莱姆',
-                            target: '史莱姆',
-                            count: 3,
-                            reward: { gold: 50, exp: 30 },
-                            completed: false
-                        }
-                    }
-                },
-                {
-                    name: '商人',
-                    avatar: '💰',
-                    dialogues: [
-                        { text: '想要什么装备？我的商店里应有尽有！', action: 'shop' }
-                    ]
-                }
-            ],
-            '森林': [
-                {
-                    name: '猎人',
-                    avatar: '🏹',
-                    dialogues: [
-                        { text: '小心森林里的狼群，它们很凶猛！', action: null },
-                        { text: '如果你等级够高，可以挑战森林深处的怪物。', action: null }
-                    ]
-                }
-            ],
-            '山洞': [
-                {
-                    name: '守墓人',
-                    avatar: '⚰️',
-                    dialogues: [
-                        { text: '山洞里埋藏着古老的秘密...', action: null },
-                        { text: '只有最强的人才能揭开真相。', action: null }
-                    ]
-                }
-            ],
-            '仙山': [
-                {
-                    name: '仙师',
-                    avatar: '🧙',
-                    dialogues: [
-                        { text: '年轻人，你终于来到了这里。', action: null },
-                        { text: '修仙之路漫长，但你的意志很坚定。', action: null },
-                        { text: '继续努力，你一定能达到巅峰！', action: null }
-                    ]
-                }
-            ]
-        };
-
-        // 任务系统
-        let activeQuests = [];
-        let completedQuests = [];
-
-        // 与 NPC 对话
-        function talkToNPC() {
-            if (!gameState.started) return;
-
-            const npcs = npcData[gameState.currentMap];
-            if (!npcs || npcs.length === 0) {
-                addLog('当前地图没有 NPC', 'info');
-                return;
-            }
-
-            showNPCModal(npcs);
-        }
-
-        // 显示 NPC 弹窗
-        function showNPCModal(npcs) {
-            let npcHTML = `
-                <div id="npc-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 200;">
-                    <div style="background: rgba(0,0,0,0.95); padding: 30px; border-radius: 15px; border: 2px solid rgba(255,255,255,0.2); max-width: 500px; max-height: 500px; overflow-y: auto;">
-                        <h2 style="color: #f093fb; margin-bottom: 20px;">NPC 列表</h2>
-                        ${npcs.map(npc => `
-                            <div style="margin: 15px 0; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px;">
-                                <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                                    <span style="font-size: 32px; margin-right: 10px;">${npc.avatar}</span>
-                                    <div>
-                                        <div style="color: #fff; font-weight: bold; font-size: 18px;">${npc.name}</div>
-                                        <div style="color: #aaa; font-size: 12px;">点击对话</div>
-                                    </div>
-                                </div>
-                                <button class="btn" onclick="showNPCDialogue('${npc.name}')">对话</button>
-                            </div>
-                        `).join('')}
-                        <button class="btn" onclick="document.getElementById('npc-modal').remove()">关闭</button>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', npcHTML);
-        }
-
-        // 显示 NPC 对话
-        function showNPCDialogue(npcName) {
-            const npcs = npcData[gameState.currentMap];
-            const npc = npcs.find(n => n.name === npcName);
-
-            if (!npc) return;
-
-            document.getElementById('npc-modal').remove();
-
-            let dialogueHTML = `
-                <div id="dialogue-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 200;">
-                    <div style="background: rgba(0,0,0,0.95); padding: 30px; border-radius: 15px; border: 2px solid rgba(255,255,255,0.2); max-width: 500px; max-height: 500px; overflow-y: auto;">
-                        <div style="display: flex; align-items: center; margin-bottom: 20px;">
-                            <span style="font-size: 48px; margin-right: 15px;">${npc.avatar}</span>
-                            <div>
-                                <h2 style="color: #f093fb; margin: 0;">${npc.name}</h2>
-                            </div>
-                        </div>
-                        <div id="dialogue-container" style="margin-bottom: 20px;">
-                            ${npc.dialogues.map((d, i) => `
-                                <div style="margin: 10px 0; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer;" onclick="selectDialogue('${npc.name}', ${i}, '${d.action || ''}')">
-                                    <div style="color: #fff; font-weight: bold;">${d.text}</div>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <button class="btn" onclick="document.getElementById('dialogue-modal').remove()">关闭</button>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', dialogueHTML);
-        }
-
-        // 选择对话选项
-        function selectDialogue(npcName, dialogueIndex, action) {
-            const npcs = npcData[gameState.currentMap];
-            const npc = npcs.find(n => n.name === npcName);
-            const dialogue = npc.dialogues[dialogueIndex];
-
-            addLog(`${npc.name}: ${dialogue.text}`, 'info');
-
-            // 检查是否有动作
-            if (action === 'shop') {
-                document.getElementById('dialogue-modal').remove();
-                showShopModal();
-            } else if (action && npc.quests && npc.quests[action]) {
-                // 接受任务
-                acceptQuest(npc.quests[action]);
-            }
-
-            // 记录对话
-            saveGame();
-        }
-
-        // 接受任务
-        function acceptQuest(quest) {
-            const existingQuest = activeQuests.find(q => q.title === quest.title);
-            if (existingQuest) {
-                addLog('你已经接取过这个任务了！', 'warning');
-                return;
-            }
-
-            activeQuests.push({
-                ...quest,
-                currentCount: 0
-            });
-
-            addLog(`接取任务：${quest.title}`, 'success');
-            addLog(quest.description, 'info');
-            saveGame();
-        }
-
-        // 更新任务进度
-        function updateQuestProgress(monsterName) {
-            activeQuests.forEach(quest => {
-                if (quest.target === monsterName && quest.currentCount < quest.count) {
-                    quest.currentCount++;
-
-                    if (quest.currentCount >= quest.count) {
-                        completeQuest(quest);
-                    } else {
-                        addLog(`任务进度：${quest.title} (${quest.currentCount}/${quest.count})`, 'info');
-                    }
-                }
-            });
-            saveGame();
-        }
-
-        // 完成任务
-        function completeQuest(quest) {
-            addLog(`完成任务：${quest.title}！`, 'success');
-            addLog(`奖励：金币 ${quest.reward.gold}，经验 ${quest.reward.exp}`, 'success');
-
-            gainExp(quest.reward.exp);
-            gainGold(quest.reward.gold);
-
-            // 移除已完成任务
-            activeQuests = activeQuests.filter(q => q.title !== quest.title);
-            completedQuests.push(quest.title);
-            saveGame();
-        }
-
-        // 显示任务列表
-        function showQuestModal() {
-            let questHTML = `
-                <div id="quest-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 200;">
-                    <div style="background: rgba(0,0,0,0.95); padding: 30px; border-radius: 15px; border: 2px solid rgba(255,255,255,0.2); max-width: 500px; max-height: 500px; overflow-y: auto;">
-                        <h2 style="color: #f093fb; margin-bottom: 20px;">任务</h2>
-                        <div style="margin-bottom: 20px;">
-                            <h3 style="color: #4ecdc4; margin-bottom: 10px;">进行中</h3>
-                            ${activeQuests.length > 0 ? activeQuests.map(quest => `
-                                <div style="margin: 10px 0; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                                    <div style="color: #fff; font-weight: bold;">${quest.title}</div>
-                                    <div style="color: #aaa; font-size: 12px; margin: 5px 0;">${quest.description}</div>
-                                    <div style="color: #fce38a; font-size: 12px;">进度：${quest.currentCount}/${quest.count}</div>
-                                </div>
-                            `).join('') : '<div style="color: #aaa; margin: 10px 0;">没有进行中的任务</div>'}
-                        </div>
-                        <div style="margin-bottom: 20px;">
-                            <h3 style="color: #4ecdc4; margin-bottom: 10px;">已完成</h3>
-                            ${completedQuests.length > 0 ? completedQuests.map(title => `
-                                <div style="margin: 10px 0; padding: 10px; background: rgba(95, 231, 211, 0.1); border-radius: 8px;">
-                                    <div style="color: #95e1d3; font-weight: bold;">${title}</div>
-                                </div>
-                            `).join('') : '<div style="color: #aaa; margin: 10px 0;">没有已完成的任务</div>'}
-                        </div>
-                        <button class="btn" onclick="document.getElementById('quest-modal').remove()">关闭</button>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', questHTML);
-        }
-
-        function learnSkill(skillName) {
-            const skill = skillData[skillName];
-
-            if (gameState.level < skill.levelReq) {
-                addLog('等级不足！', 'danger');
-                return;
-            }
-
-            if (gameState.skills.includes(skillName)) {
-                addLog('已经学会了这个技能！', 'warning');
-                return;
-            }
-
-            gameState.skills.push(skillName);
-            addLog(`学会了 ${skillName}！`, 'success');
-            saveGame();
-            showSkillModal();
-        }
-
-        function useSkill(skillName) {
-            if (!battleState.active || battleState.turn !== 'player') {
-                addLog('只能在战斗中使用技能！', 'danger');
-                return;
-            }
-
-            const skill = skillData[skillName];
-
-            if (skill.heal) {
-                const healAmount = skill.heal + (gameState.level - 1) * skill.healBonus;
-                gameState.hp = Math.min(gameState.maxHp, gameState.hp + healAmount);
-                addLog(`使用 ${skillName}，恢复 ${healAmount} 生命！`, 'success');
-            } else {
-                const monster = gameState.monsters[battleState.monsterIndex];
-                const damage = Math.max(1, (gameState.attack + skill.attackBonus) - monster.defense);
-
-                monster.hp -= damage;
-                addLog(`使用 ${skillName}，对 ${monster.name} 造成 ${damage} 点伤害！`, 'success');
-
-                if (monster.hp <= 0) {
-                    battleVictory();
-                    return;
-                } else {
-                    addLog(`${monster.name} 剩余生命：${monster.hp}`, 'info');
-                    battleState.turn = 'monster';
-                    setTimeout(monsterAttack, 1000);
-                }
-            }
-
-            updateUI();
-        }
-
-        function showSkillModal() {
-            let skillHTML = `
-                <div id="skill-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 200;">
-                    <div style="background: rgba(0,0,0,0.95); padding: 30px; border-radius: 15px; border: 2px solid rgba(255,255,255,0.2); max-width: 500px; max-height: 500px; overflow-y: auto;">
-                        <h2 style="color: #f093fb; margin-bottom: 20px;">技能</h2>
-                        <div style="margin-bottom: 20px;">
-                            <h3 style="color: #4ecdc4; margin-bottom: 10px;">已学会</h3>
-                            ${gameState.skills.length > 0 ? gameState.skills.map(skillName => `
-                                <div style="margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                                    <div style="color: #fff; font-weight: bold;">${skillName}</div>
-                                    <div style="color: #aaa; font-size: 12px;">${skillData[skillName].damage ? '伤害' : '治疗'} +${skillData[skillName].damage || skillData[skillName].heal} | 消耗 MP: ${skillData[skillName].mpCost}</div>
-                                    ${battleState.active && battleState.turn === 'player' ? `<button class="btn" style="width: 80px; margin-top: 10px;" onclick="useSkill('${skillName}')">使用</button>` : ''}
-                                </div>
-                            `).join('') : '<div style="color: #aaa; margin: 10px 0;">没有学会任何技能</div>'}
-                        </div>
-                        <div style="margin-bottom: 20px;">
-                            <h3 style="color: #4ecdc4; margin-bottom: 10px;">可学习</h3>
-                            ${Object.keys(skillData).filter(skillName => !gameState.skills.includes(skillName)).map(skillName => `
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                                    <div>
-                                        <div style="color: #fff; font-weight: bold;">${skillName}</div>
-                                        <div style="color: #aaa; font-size: 12px;">等级要求：${skillData[skillName].levelReq}</div>
-                                    </div>
-                                    ${gameState.level >= skillData[skillName].levelReq ? `<button class="btn" style="width: 80px;" onclick="learnSkill('${skillName}')">学习</button>` : '<div style="color: #aaa;">等级不足</div>'}
-                                </div>
-                            `).join('')}
-                        </div>
-                        <button class="btn" onclick="document.getElementById('skill-modal').remove()">关闭</button>
-                    </div>
-                </div>
-            `;
-            document.getElementById('inventory-modal').remove();
-            document.body.insertAdjacentHTML('beforeend', skillHTML);
-        }
-
-        // 角色升级
-        function levelUp() {
-            if (gameState.exp >= gameState.expToLevel) {
-                gameState.level++;
-                gameState.exp -= gameState.expToLevel;
-                gameState.expToLevel = Math.floor(gameState.expToLevel * 1.5);
-
-                // 提升属性
-                gameState.maxHp += 20;
-                gameState.hp = gameState.maxHp;
-                gameState.attack += 5;
-                gameState.defense += 3;
-
-                addLog(`恭喜升级！当前等级：${gameState.level}`, 'success');
-                addLog(`生命值+20，攻击力+5，防御力+3`, 'info');
-                updateUI();
-                saveGame();
-            }
-        }
-
-        // 获得经验
-        function gainExp(amount) {
-            gameState.exp += amount;
-            addLog(`获得经验：${amount}`, 'info');
-
-            if (gameState.exp >= gameState.expToLevel) {
-                levelUp();
-            }
-
-            updateUI();
-            saveGame();
-        }
-
-        // 获得金币
-        function gainGold(amount) {
-            gameState.gold += amount;
-            addLog(`获得金币：${amount}`, 'success');
-            updateUI();
-            saveGame();
-        }
-
-        // 存档
-        function saveGame() {
-            const saveData = {
-                ...gameState,
-                activeQuests,
-                completedQuests
-            };
-            localStorage.setItem('immortalGame', JSON.stringify(saveData));
-        }
-
-        // 读档
-        function loadGame() {
-            const savedData = localStorage.getItem('immortalGame');
-            if (savedData) {
-                const loadedState = JSON.parse(savedData);
-
-                // 恢复游戏状态
-                gameState = {
-                    ...gameState,
-                    ...loadedState
-                };
-
-                // 恢复任务系统
-                if (loadedState.activeQuests) activeQuests = loadedState.activeQuests;
-                if (loadedState.completedQuests) completedQuests = loadedState.completedQuests;
-
-                return true;
-            }
-            return false;
-        }
-
-        // 初始化
-        function init() {
-            // 尝试加载存档
-            if (loadGame()) {
-                document.getElementById('start-screen').style.display = 'none';
-                gameState.started = true;
-                addLog('欢迎回来，修仙者！', 'success');
-                updateUI();
-                gameLoop();
-            } else {
-                updateUI();
-            }
-        }
-
-        init();
-    </script>
+      } catch (error) {
+        showToast('保存失败: ' + error.message);
+      }
+    };
+
+    // 打开模态框
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.add('active');
+    }
+
+    // 关闭模态框
+    window.closeModal = function(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    };
+
+    // 显示加载界面
+    function showLoading(text, progress) {
+      const loadingScreen = document.getElementById('loading-screen');
+      const loadingText = document.getElementById('loading-text');
+      const loadingProgress = document.getElementById('loading-progress');
+
+      loadingText.textContent = text;
+      loadingProgress.style.width = progress + '%';
+    }
+
+    // 隐藏加载界面
+    function hideLoading() {
+      document.getElementById('loading-screen').style.display = 'none';
+    }
+
+    // 显示消息提示
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // 点击画布移动玩家
+    canvas.addEventListener('click', async (e) => {
+      if (!gameState) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      try {
+        await coordinatorAPI.playerMove(x, y, 'down');
+        updateUI();
+      } catch (error) {
+        showToast('移动失败: ' + error.message);
+      }
+    });
+
+    // 窗口大小改变
+    window.addEventListener('resize', resizeCanvas);
+
+    // 初始化游戏
+    window.addEventListener('load', initGame);
+
+    // 导出全局函数（用于调试）
+    window.coordinatorAPI = coordinatorAPI;
+    window.gameState = () => gameState;
+  </script>
 </body>
 </html>
