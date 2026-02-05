@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>协调 Agent 测试</title>
+  <style>
+    body {
+      font-family: 'Microsoft YaHei', sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #e0e0e0;
+    }
+
+    h1 {
+      text-align: center;
+      color: #f4d03f;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .test-section {
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(244,208,63,0.3);
+    }
+
+    h2 {
+      color: #f4d03f;
+      margin-top: 0;
+    }
+
+    button {
+      background: linear-gradient(135deg, #f4d03f 0%, #16a085 100%);
+      color: #1a1a2e;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    pre {
+      background: rgba(0,0,0,0.3);
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      border-left: 3px solid #f4d03f;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 5px 10px;
+      margin: 5px 0;
+      border-radius: 3px;
+      font-weight: bold;
+    }
+
+    .success {
+      background: #27ae60;
+      color: white;
+    }
+
+    .error {
+      background: #c0392b;
+      color: white;
+    }
+
+    .info {
+      background: #3498db;
+      color: white;
+    }
+
+    .game-state {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 15px;
+    }
+
+    .state-card {
+      background: rgba(255,255,255,0.1);
+      padding: 15px;
+      border-radius: 5px;
+      border: 1px solid rgba(244,208,63,0.2);
+    }
+
+    .state-card h3 {
+      margin-top: 0;
+      color: #f4d03f;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎮 协调 Agent 测试</h1>
+
+  <div class="test-section">
+    <h2>1. 初始化测试</h2>
+    <button onclick="testInit()">初始化游戏</button>
+    <button onclick="testReset()">重置游戏</button>
+    <div id="initStatus"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>2. 事件处理测试</h2>
+    <button onclick="testPlayerMove()">玩家移动</button>
+    <button onclick="testStartBattle()">开始战斗</button>
+    <button onclick="testCompleteTask()">完成任务</button>
+    <button onclick="testClickNPC()">点击 NPC</button>
+    <button onclick="testPlayerAttack()">玩家攻击</button>
+    <div id="eventStatus"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>3. 存档管理测试</h2>
+    <button onclick="testSaveGame()">保存游戏</button>
+    <button onclick="testLoadGame()">加载游戏</button>
+    <button onclick="testHasSave()">检查存档</button>
+    <button onclick="testDeleteSave()">删除存档</button>
+    <div id="saveStatus"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>4. 游戏状态查看</h2>
+    <button onclick="displayGameState()">显示游戏状态</button>
+    <div id="gameStateDisplay" class="game-state"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>5. 测试日志</h2>
+    <pre id="testLog">// 测试日志将显示在这里</pre>
+  </div>
+
+  <script type="module">
+    import coordinatorAPI from './js/coordinator-api.js';
+
+    window.coordinatorAPI = coordinatorAPI;
+    let gameState = null;
+
+    // 日志函数
+    function log(message, type = 'info') {
+      const logElement = document.getElementById('testLog');
+      const timestamp = new Date().toLocaleTimeString();
+      const statusClass = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+      logElement.innerHTML = `<span class="status ${statusClass}">[${timestamp}] ${message}</span><br>` + logElement.innerHTML;
+    }
+
+    // 测试初始化
+    window.testInit = async function() {
+      try {
+        log('初始化游戏...', 'info');
+        gameState = await coordinatorAPI.initGame();
+        log('✅ 游戏初始化成功', 'success');
+        document.getElementById('initStatus').innerHTML = '<span class="status success">✅ 初始化成功</span>';
+        displayGameState();
+      } catch (error) {
+        log(`❌ 初始化失败: ${error.message}`, 'error');
+        document.getElementById('initStatus').innerHTML = `<span class="status error">❌ ${error.message}</span>`;
+      }
+    };
+
+    // 测试重置
+    window.testReset = async function() {
+      try {
+        log('重置游戏...', 'info');
+        gameState = await coordinatorAPI.resetGame();
+        log('✅ 游戏重置成功', 'success');
+        document.getElementById('initStatus').innerHTML = '<span class="status success">✅ 重置成功</span>';
+        displayGameState();
+      } catch (error) {
+        log(`❌ 重置失败: ${error.message}`, 'error');
+        document.getElementById('initStatus').innerHTML = `<span class="status error">❌ ${error.message}</span>`;
+      }
+    };
+
+    // 测试玩家移动
+    window.testPlayerMove = async function() {
+      try {
+        log('测试玩家移动...', 'info');
+        const result = await coordinatorAPI.playerMove(100, 200, 'right');
+        log(`✅ 玩家移动成功: ${JSON.stringify(result.player?.position)}`, 'success');
+        document.getElementById('eventStatus').innerHTML = '<span class="status success">✅ 移动成功</span>';
+        displayGameState();
+      } catch (error) {
+        log(`❌ 移动失败: ${error.message}`, 'error');
+        document.getElementById('eventStatus').innerHTML = `<span class="status error">❌ ${error.message}</span>`;
+      }
+    };
+
+    // 测试开始战斗
+    window.testStartBattle = async function() {
+      try {
+        log('测试开始战斗...', 'info');
+        const result = await coordinatorAPI.startBattle('monster1', 'wolf');
+        log(`✅ 战斗开始: ${result.message}`, 'success');
+        document.getElementById('eventStatus').innerHTML = '<span class="status success">✅ 战斗开始</span>';
+        displayGameState();
+      } catch (error) {
+        log(`❌ 战斗开始失败: ${error.message}`, 'error');
+        document.getElementById('eventStatus').innerHTML = `<span class="status error">❌ ${error.message}</span>`;
+      }
+    };
+
+    // 测试完成任务
+    window.testCompleteTask = async function() {
+      try {
+        // 先添加一个测试任务
+        if (!gameState || !gameState.tasks || gameState.tasks.length === 0) {
+          log('⚠️ 没有任务，先添加测试任务', 'info');
+          // 这里需要通过游戏状态更新来添加任务
+          log('提示：需要先通过 NPC 接受任务', 'info');
+          return;
+        }
+
+        log('测试完成任务...', 'info');
+        const result = await coordinatorAPI.completeTask(gameState.tasks[0].id);
+        log(`✅ 任务完成`, 'success');
+        document.getElementById('eventStatus').innerHTML = '<span class="status success">✅ 任务完成</span>';
+        displayGameState();
+      } catch (error) {
+        log(`❌ 任务完成失败: ${error.message}`, 'error');
+        document.getElementById('eventStatus').innerHTML = `<span class="status error">❌ ${error.message}</span>`;
+      }
+    };
+
+    // 测试点击 NPC
+    window.testClickNPC = async function() {
+      try {
+        log('测试点击 NPC...', 'info');
+        const result = await coordinatorAPI.clickNPC('village_chief');
+        log(`✅ 点击 NPC 成功: ${result.message}`, 'success');
+        document.getElementById('eventStatus').innerHTML = '<span class="status success">✅ NPC 点击成功</span>';
+        displayGameState();
+      } catch (error) {
+        log(`❌ 点击 NPC 失败: ${error.message}`, 'error');
+        document.getElementById('eventStatus').innerHTML = `<span class="status error">❌ ${error.message}</span>`;
+      }
+    };
+
+    // 测试玩家攻击
+    window.testPlayerAttack = async function() {
+      try {
+        log('测试玩家攻击...', 'info');
+        const result = await coordinatorAPI.playerAttack('monster1', 25);
+        log(`✅ 攻击成功: ${result.message}`, 'success');
+        document.getElementById('eventStatus').innerHTML = '<span class="status success">✅ 攻击成功</span>';
+        displayGameState();
+      } catch (error) {
+        log(`❌ 攻击失败: ${error.message}`, 'error');
+        document.getElementById('eventStatus').innerHTML = `<span class="status error">❌ ${error.message}</span>`;
+      }
+    };
+
+    // 测试保存游戏
+    window.testSaveGame = async function() {
+      try {
+        log('保存游戏...', 'info');
+        const success = await coordinatorAPI.saveGame();
+        if (success) {
+          log('✅ 游戏保存成功', 'success');
+          document.getElementById('saveStatus').innerHTML = '<span class="status success">✅ 保存成功</span>';
+        } else {
+          log('❌ 保存失败', 'error');
+          document.getElementById('saveStatus').innerHTML = '<span class="status error">❌ 保存失败</span>';
+        }
+      } catch (error) {
+        log(`❌ 保存失败: ${error.message}`, 'error');
+        document.getElementById('saveStatus').innerHTML = `<span class="status error">❌ ${error.message}</span>`;
+      }
+    };
+
+    // 测试加载游戏
+    window.testLoadGame = async function() {
+      try {
+        log('加载游戏...', 'info');
+        const loadedState = await coordinatorAPI.loadGame();
+        if (loadedState) {
+          log('✅ 游戏加载成功', 'success');
+          gameState = loadedState;
+          document.getElementById('saveStatus').innerHTML = '<span class="status success">✅ 加载成功</span>';
+          displayGameState();
+        } else {
+          log('⚠️ 没有找到存档', 'info');
+          document.getElementById('saveStatus').innerHTML = '<span class="status info">⚠️ 没有存档</span>';
+        }
+      } catch (error) {
+        log(`❌ 加载失败: ${error.message}`, 'error');
+        document.getElementById('saveStatus').innerHTML = `<span class="status error">❌ ${error.message}</span>`;
+      }
+    };
+
+    // 测试检查存档
+    window.testHasSave = function() {
+      try {
+        const hasSave = coordinatorAPI.hasSave();
+        log(`存档状态: ${hasSave ? '✅ 有存档' : '⚠️ 没有存档'}`, hasSave ? 'success' : 'info');
+        document.getElementById('saveStatus').innerHTML = hasSave ?
+          '<span class="status success">✅ 有存档</span>' :
+          '<span class="status info">⚠️ 没有存档</span>';
+      } catch (error) {
+        log(`❌ 检查存档失败: ${error.message}`, 'error');
+      }
+    };
+
+    // 测试删除存档
+    window.testDeleteSave = function() {
+      try {
+        log('删除存档...', 'info');
+        const success = coordinatorAPI.deleteSave();
+        if (success) {
+          log('✅ 存档删除成功', 'success');
+          document.getElementById('saveStatus').innerHTML = '<span class="status success">✅ 删除成功</span>';
+        } else {
+          log('❌ 删除失败', 'error');
+          document.getElementById('saveStatus').innerHTML = '<span class="status error">❌ 删除失败</span>';
+        }
+      } catch (error) {
+        log(`❌ 删除失败: ${error.message}`, 'error');
+        document.getElementById('saveStatus').innerHTML = `<span class="status error">❌ ${error.message}</span>`;
+      }
+    };
+
+    // 显示游戏状态
+    window.displayGameState = function() {
+      if (!coordinatorAPI.isGameInitialized()) {
+        log('⚠️ 游戏未初始化', 'info');
+        return;
+      }
+
+      try {
+        const state = coordinatorAPI.getGameState();
+        const display = document.getElementById('gameStateDisplay');
+
+        display.innerHTML = `
+          <div class="state-card">
+            <h3>👤 玩家信息</h3>
+            <pre>${JSON.stringify(state.player, null, 2)}</pre>
+          </div>
+          <div class="state-card">
+            <h3>📍 当前地图</h3>
+            <pre>${JSON.stringify({
+              currentMap: state.currentMap,
+              position: state.player?.position
+            }, null, 2)}</pre>
+          </div>
+          <div class="state-card">
+            <h3>🎒 背包</h3>
+            <pre>${JSON.stringify(state.inventory, null, 2)}</pre>
+          </div>
+          <div class="state-card">
+            <h3>⚔️ 技能</h3>
+            <pre>${JSON.stringify(state.skills, null, 2)}</pre>
+          </div>
+          <div class="state-card">
+            <h3>📋 任务</h3>
+            <pre>${JSON.stringify(state.tasks, null, 2)}</pre>
+          </div>
+          <div class="state-card">
+            <h3>🛡️ 装备</h3>
+            <pre>${JSON.stringify(state.equipment, null, 2)}</pre>
+          </div>
+        `;
+
+        log('✅ 游戏状态已更新', 'success');
+      } catch (error) {
+        log(`❌ 显示游戏状态失败: ${error.message}`, 'error');
+      }
+    };
+
+    // 初始化时检查存档
+    window.addEventListener('load', () => {
+      log('页面加载完成', 'info');
+      window.testHasSave();
+    });
+  </script>
+</body>
+</html>
