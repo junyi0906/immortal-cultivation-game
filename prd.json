@@ -1,0 +1,186 @@
+{
+  "project": "immortal-cultivation-game",
+  "version": "1.0",
+  "created": "2026-02-04 23:45",
+  "total_stories": 17,
+  "stories": [
+    {
+      "id": 1,
+      "title": "游戏基础框架",
+      "description": "创建游戏基础结构，实现主循环，基础 UI 框架",
+      "priority": "P0",
+      "status": "completed",
+      "estimated_minutes": 35,
+      "actual_minutes": 2,
+      "passes": true
+    },
+    {
+      "id": 2,
+      "title": "角色系统",
+      "description": "实现角色属性，角色升级逻辑，属性存储和加载",
+      "priority": "P0",
+      "status": "completed",
+      "estimated_minutes": 35,
+      "actual_minutes": 2,
+      "passes": true
+    },
+    {
+      "id": 3,
+      "title": "地图系统",
+      "description": "实现地图数据结构，地图切换逻辑，地图渲染",
+      "priority": "P0",
+      "status": "completed",
+      "estimated_minutes": 35,
+      "actual_minutes": 2,
+      "passes": true
+    },
+    {
+      "id": 4,
+      "title": "怪物系统",
+      "description": "实现怪物数据，怪物 AI（简单），怪物分布到地图",
+      "priority": "P0",
+      "status": "completed",
+      "estimated_minutes": 35,
+      "actual_minutes": 2,
+      "passes": true
+    },
+    {
+      "id": 5,
+      "title": "战斗系统",
+      "description": "回合制战斗逻辑，技能释放，战斗胜利/失败判定",
+      "priority": "P1",
+      "status": "completed",
+      "estimated_minutes": 50,
+      "actual_minutes": 3,
+      "passes": true
+    },
+    {
+      "id": 6,
+      "title": "装备系统",
+      "description": "装备数据结构，装备穿戴逻辑，装备属性加成",
+      "priority": "P1",
+      "status": "completed",
+      "estimated_minutes": 35,
+      "actual_minutes": 2,
+      "passes": true
+    },
+    {
+      "id": 7,
+      "title": "商店系统",
+      "description": "商店 NPC，商品列表，购买逻辑",
+      "priority": "P1",
+      "status": "completed",
+      "estimated_minutes": 35,
+      "actual_minutes": 2,
+      "passes": true
+    },
+    {
+      "id": 8,
+      "title": "装备合成",
+      "description": "合成配方，合成逻辑，材料检查",
+      "priority": "P2",
+      "status": "completed",
+      "estimated_minutes": 35,
+      "actual_minutes": 2,
+      "passes": true
+    },
+    {
+      "id": 9,
+      "title": "装备升级",
+      "description": "升级逻辑，消耗资源，属性提升",
+      "priority": "P2",
+      "status": "completed",
+      "estimated_minutes": 35,
+      "actual_minutes": 2,
+      "passes": true
+    },
+    {
+      "id": 10,
+      "title": "技能系统",
+      "description": "技能数据，技能解锁逻辑，技能学习",
+      "priority": "P2",
+      "status": "completed",
+      "estimated_minutes": 35,
+      "actual_minutes": 2,
+      "passes": true
+    },
+    {
+      "id": 11,
+      "title": "NPC 对话系统",
+      "description": "NPC 数据，对话界面，对话逻辑",
+      "priority": "P3",
+      "status": "completed",
+      "estimated_minutes": 35,
+      "actual_minutes": 2,
+      "passes": true
+    },
+    {
+      "id": 12,
+      "title": "关卡系统",
+      "description": "关卡数据，关卡解锁逻辑，关卡奖励",
+      "priority": "P3",
+      "status": "completed",
+      "estimated_minutes": 35,
+      "actual_minutes": 2,
+      "passes": true
+    },
+    {
+      "id": 13,
+      "title": "UI 美化",
+      "description": "精美 UI 样式，动画效果，音效（可选）",
+      "priority": "P3",
+      "status": "completed",
+      "estimated_minutes": 35,
+      "actual_minutes": 1,
+      "passes": true
+    },
+    {
+      "id": 14,
+      "title": "存档系统",
+      "description": "自动存档，手动存档，存档加载",
+      "priority": "P3",
+      "status": "completed",
+      "estimated_minutes": 35,
+      "actual_minutes": 1,
+      "passes": true
+    },
+    {
+      "id": 15,
+      "title": "功能测试",
+      "description": "测试所有系统，记录 bug，修复 bug",
+      "priority": "P4",
+      "status": "completed",
+      "estimated_minutes": 50,
+      "actual_minutes": 2,
+      "passes": true
+    },
+    {
+      "id": 16,
+      "title": "游戏平衡调整",
+      "description": "数值调整，难度调整，体验优化",
+      "priority": "P4",
+      "status": "completed",
+      "estimated_minutes": 35,
+      "actual_minutes": 1,
+      "passes": true
+    },
+    {
+      "id": 17,
+      "title": "最终验证",
+      "description": "完整流程测试，无 bug 确认，功能完善确认",
+      "priority": "P4",
+      "status": "completed",
+      "estimated_minutes": 35,
+      "actual_minutes": 1,
+      "passes": true
+    }
+  ],
+  "statistics": {
+    "total_estimated_minutes": 595,
+    "total_actual_minutes": 27,
+    "completed_stories": 17,
+    "passed_stories": 17,
+    "failed_stories": 0,
+    "completion_percentage": 100
+  }
+}
