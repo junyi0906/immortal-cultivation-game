@@ -205,6 +205,14 @@
             <div class="panel-section">
                 <div class="panel-title">角色信息</div>
                 <div class="info-row">
+                    <span class="info-label">名字</span>
+                    <span class="info-value" id="character-name">主角</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">职业</span>
+                    <span class="info-value" id="character-class">剑修</span>
+                </div>
+                <div class="info-row">
                     <span class="info-label">等级</span>
                     <span class="info-value" id="level">1</span>
                 </div>
@@ -279,7 +287,8 @@
 
         <div id="start-screen">
             <h1>修仙传说</h1>
-            <button class="btn" onclick="startGame()">开始游戏</button>
+            <button class="btn" onclick="startGame()">继续游戏</button>
+            <button class="btn" onclick="createNewCharacter()">创建角色</button>
         </div>
     </div>
 
@@ -290,9 +299,15 @@
 
         let gameState = {
             started: false,
+            name: '主角',
+            className: '剑修',
+            class: 'swordsman',
+            icon: '⚔️',
             level: 1,
             hp: 100,
             maxHp: 100,
+            mp: 50,
+            maxMp: 50,
             exp: 0,
             expToLevel: 100,
             attack: 10,
@@ -308,7 +323,13 @@
             },
             inventory: [],
             activeQuests: [],
-            completedQuests: []
+            completedQuests: [],
+            images: {
+                idle: null,
+                attack: null,
+                injured: null,
+                victory: null
+            }
         };
 
         // 地图数据
@@ -618,6 +639,8 @@
 
         // 更新 UI
         function updateUI() {
+            document.getElementById('character-name').textContent = gameState.name;
+            document.getElementById('character-class').textContent = gameState.className;
             document.getElementById('level').textContent = gameState.level;
             document.getElementById('hp').textContent = `${gameState.hp}/${gameState.maxHp}`;
             document.getElementById('exp').textContent = `${gameState.exp}/${gameState.expToLevel}`;
@@ -653,15 +676,56 @@
 
         // 开始游戏
         function startGame() {
+            // 检查是否有角色数据
+            const character = localStorage.getItem('character');
+            if (!character) {
+                // 没有角色，跳转到角色创建页面
+                window.location.href = 'character-creation.html';
+                return;
+            }
+
+            // 加载角色数据
+            loadCharacter();
+
             gameState.started = true;
             document.getElementById('start-screen').style.display = 'none';
             addLog('欢迎来到修仙世界！', 'success');
+            addLog(`当前角色：${gameState.name}（${gameState.className}）`, 'info');
             addLog('当前地图：新手村', 'info');
             addLog('点击"探索"开始冒险', 'info');
             updateStats();
             spawnMonsters();
             updateUI();
             gameLoop();
+        }
+
+        // 创建新角色
+        function createNewCharacter() {
+            window.location.href = 'character-creation.html';
+        }
+
+        // 加载角色数据
+        function loadCharacter() {
+            const characterStr = localStorage.getItem('character');
+            if (!characterStr) return;
+
+            const character = JSON.parse(characterStr);
+
+            gameState.name = character.name;
+            gameState.className = character.className;
+            gameState.class = character.class;
+            gameState.icon = character.icon;
+            gameState.level = character.level;
+            gameState.exp = character.exp;
+            gameState.expToLevel = character.expToLevel;
+            gameState.hp = character.hp;
+            gameState.maxHp = character.maxHp;
+            gameState.mp = character.mp;
+            gameState.maxMp = character.maxMp;
+            gameState.attack = character.attack;
+            gameState.defense = character.defense;
+            gameState.gold = character.gold;
+            gameState.images = character.images;
         }
 
         // 战斗状态
