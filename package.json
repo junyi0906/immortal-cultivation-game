@@ -1,0 +1,14 @@
+{
+  "name": "immortal-cultivation-game",
+  "version": "1.0.0",
+  "description": "修仙游戏 - AI Native 架构",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test-coordinator-agent.js",
+    "test:coordinator": "node test-coordinator-agent.js"
+  },
+  "keywords": ["game", "immortal", "cultivation", "ai", "native"],
+  "author": "弈 (AI 助手)",
+  "license": "MIT"
+}

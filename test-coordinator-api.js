@@ -22,7 +22,10 @@ if (typeof window === "undefined") {
 }
 
 // 导入 API 模块
-import {
+import coordinatorAPI from "./js/coordinator-api.js";
+import { createMessage as createMessageAgent } from "./js/coordinator-agent.js";
+
+const {
   initGame,
   resetGame,
   handleEvent,
@@ -41,21 +44,10 @@ import {
   getInventory,
   getSkills,
   getTasks,
-  hasSave,
-  getGameState as getGameStateAPI,
-  getPlayer,
-  getCurrentMap,
-  getInventory,
-  getSkills,
-  getTasks,
   getEquipment,
   isGameInitialized,
   getEventTypes
-} from "./js/coordinator-api.js";
-import { createMessage as createMessageAgent } from "./js/coordinator-agent.js";
-
-// 简化调用
-const getGameState = getGameStateAPI;
+} = coordinatorAPI;
 
 console.log("=== 开始测试协调 Agent API ===\n");
 
@@ -73,7 +65,7 @@ initGame()
 
     // 测试 US-022: 获取游戏状态函数（API）
     console.log("测试 US-022: 获取游戏状态函数（API）");
-    const state = getGameState();
+    const state = getGameStateAPI();
     console.log("✅ getGameStateAPI() 函数已创建");
     console.log("  - 返回对象:", typeof state === "object");
     console.log("  - 玩家等级:", state.player.level);
@@ -122,7 +114,7 @@ initGame()
     console.log();
 
     // 添加一个任务并测试完成
-    const state = getGameState();
+    const state = getGameStateAPI();
     state.tasks = [
       { id: "task1", description: "击败 5 只狼", rewards: { gold: 100, exp: 50 }, completed: false }
     ];
@@ -162,6 +154,7 @@ initGame()
     console.log();
 
     // 测试消息创建
+    console.log("测试消息创建");
     const msg = createMessageAgent("PLAYER_MOVE", { x: 50, y: 50 });
     console.log("  - createMessage():", typeof msg === "string");
     console.log("  - 消息格式正确:", msg.includes("PLAYER_MOVE"));
