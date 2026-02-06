@@ -40,7 +40,62 @@ const NPC_DATA = {
     role: "技能传授者",
     personality: "高深莫测、神秘、智慧",
     background: "曾是仙人下凡",
-    avatar: "🧙"
+    avatar: "🧙",
+    shopId: "immortal_shop" // 添加商店 ID
+  }
+};
+
+// ==================== 技能商店数据 ====================
+
+/**
+ * 技能商店数据
+ */
+const SKILL_SHOP_DATA = {
+  immortal_shop: {
+    id: "immortal_shop",
+    name: "仙师技能店",
+    items: [
+      {
+        id: "heal",
+        name: "治疗术",
+        type: "skill",
+        mpCost: 10,
+        cooldown: 3,
+        description: "恢复 50 点生命值。",
+        price: 100,
+        effect: { hp: 50 }
+      },
+      {
+        id: "fireball",
+        name: "火球术",
+        type: "skill",
+        mpCost: 15,
+        cooldown: 4,
+        description: "发射火球，造成 30 点伤害。",
+        price: 150,
+        effect: { damage: 30 }
+      },
+      {
+        id: "thunder",
+        name: "雷霆术",
+        type: "skill",
+        mpCost: 20,
+        cooldown: 5,
+        description: "召唤雷电，造成 50 点伤害。",
+        price: 200,
+        effect: { damage: 50 }
+      },
+      {
+        id: "shield",
+        name: "护盾术",
+        type: "skill",
+        mpCost: 10,
+        cooldown: 3,
+        description: "召唤护盾，增加 10 点防御。",
+        price: 120,
+        effect: { defense: 10 }
+      }
+    ]
   }
 };
 
@@ -445,7 +500,7 @@ class NPCAgent {
     }
 
     // 检查是否已经学习了这个技能
-    const existingSkill = gameState.skills?.find(s => s.id === skillId);
+    const existingSkill = gameState.player.skills?.find(s => s.id === skillId);
     if (existingSkill) {
       throw new Error("你已经学习了这个技能");
     }
@@ -460,9 +515,71 @@ class NPCAgent {
       throw new Error("职业不匹配");
     }
 
+    // 添加技能到玩家技能列表
+    if (!gameState.player.skills) {
+      gameState.player.skills = [];
+    }
+    gameState.player.skills.push({
+      id: skill.id,
+      name: skill.name,
+      type: skill.type,
+      level: 1
+    });
+
     return {
       skill: skill,
       message: `学会了技能：${skill.name}`
+    };
+  }
+
+  /**
+   * 购买技能
+   * @param {string} shopId - 商店 ID
+   * @param {string} skillId - 技能 ID
+   * @param {Object} gameState - 游戏状态
+   * @returns {Object} 购买结果
+   */
+  buySkill(shopId, skillId, gameState) {
+    const shop = SKILL_SHOP_DATA[shopId];
+    const skillItem = shop?.items.find(i => i.id === skillId);
+
+    if (!skillItem) {
+      throw new Error(`Skill not found: ${skillId}`);
+    }
+
+    // 检查金币是否足够
+    if (gameState.player.gold < skillItem.price) {
+      throw new Error("金币不足");
+    }
+
+    // 检查是否已经学习了这个技能
+    const existingSkill = gameState.player.skills?.find(s => s.id === skillId);
+    if (existingSkill) {
+      throw new Error("你已经学习了这个技能");
+    }
+
+    // 扣除金币
+    gameState.player.gold -= skillItem.price;
+
+    // 添加技能到玩家技能列表
+    if (!gameState.player.skills) {
+      gameState.player.skills = [];
+    }
+    gameState.player.skills.push({
+      id: skillId,
+      name: skillItem.name,
+      type: skillItem.type,
+      mpCost: skillItem.mpCost,
+      cooldown: skillItem.cooldown,
+      level: 1,
+      description: skillItem.description,
+      effect: skillItem.effect
+    });
+
+    return {
+      skill: skillItem,
+      cost: skillItem.price,
+      message: `学会了技能：${skillItem.name}`
     };
   }
 }
@@ -470,4 +587,5 @@ class NPCAgent {
 // ==================== 导出 ====================
 
 export const npcAgent = new NPCAgent();
-export { NPC_DATA, TASK_DATA, SHOP_DATA, SKILL_DATA };
+export { NPC_DATA, TASK_DATA, SHOP_DATA, SKILL_DATA, SKILL_SHOP_DATA };
+export { generateDialogue, assignTask, checkTaskComplete, updateTaskProgress, getShopItems, buyItem, getSkills, learnSkill, buySkill };
