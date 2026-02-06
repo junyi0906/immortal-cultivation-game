@@ -2586,6 +2586,12 @@
       alert('发生错误: ' + (e.error && e.error.message));
     });
 
+    // 未捕获的 Promise 错误捕获
+    window.addEventListener('unhandledrejection', function(e) {
+      console.error('[未捕获的 Promise 错误]', e.reason);
+      alert('发生异步错误: ' + (e.reason && e.reason.message));
+    });
+
     // 初始化游戏（等待 DOM 加载完成）
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initGame);
