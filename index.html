@@ -1264,17 +1264,15 @@
       updateCreateButton();
     };
 
-    // 输入名字
-    document.addEventListener('DOMContentLoaded', () => {
-      const nameInput = document.getElementById('character-name');
-      if (nameInput) {
-        nameInput.addEventListener('input', function(e) {
-          currentName = e.target.value.trim();
-          document.getElementById('info-name').textContent = currentName || '未命名';
-          updateCreateButton();
-        });
-      }
-    });
+    // 输入名字（直接添加监听器，无需 DOMContentLoaded 包装）
+    const nameInput = document.getElementById('character-name');
+    if (nameInput) {
+      nameInput.addEventListener('input', function(e) {
+        currentName = e.target.value.trim();
+        document.getElementById('info-name').textContent = currentName || '未命名';
+        updateCreateButton();
+      });
+    }
 
     // 更新创建按钮状态
     function updateCreateButton() {
