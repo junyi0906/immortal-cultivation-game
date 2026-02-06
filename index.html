@@ -1381,19 +1381,132 @@
 
     // 渲染战斗场景
     function renderBattle() {
+      if (!gameState || !gameState.battleState) return;
+
+      const battleState = gameState.battleState;
+      const player = gameState.player;
+
       // 战斗背景
       ctx.fillStyle = '#2c2c54';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // 战斗 UI
+      // 战斗标题
       ctx.fillStyle = '#fff';
       ctx.font = 'bold 32px Microsoft YaHei';
       ctx.textAlign = 'center';
-      ctx.fillText('战斗中...', canvas.width / 2, 100);
+      ctx.fillText('战斗中...', canvas.width / 2, 60);
 
-      // TODO: 渲染战斗角色和怪物
-      // TODO: 渲染血条
-      // TODO: 渲染技能按钮
+      // 玩家信息（左侧）
+      const playerX = canvas.width * 0.25;
+      const playerY = canvas.height * 0.4;
+
+      // 玩家圆圈
+      ctx.beginPath();
+      ctx.arc(playerX, playerY, 60, 0, Math.PI * 2);
+      ctx.fillStyle = '#f4d03f';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      // 玩家图标
+      ctx.fillStyle = '#fff';
+      ctx.font = '48px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('👤', playerX, playerY + 15);
+
+      // 玩家名字
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 20px Microsoft YaHei';
+      ctx.fillText(player.name || '玩家', playerX, playerY + 90);
+
+      // 玩家血条
+      const playerHpPercent = (player.hp / player.maxHp) * 100;
+      const playerHpBarWidth = 200;
+      const playerHpBarX = playerX - playerHpBarWidth / 2;
+      const playerHpBarY = playerY + 110;
+
+      ctx.fillStyle = '#333';
+      ctx.fillRect(playerHpBarX, playerHpBarY, playerHpBarWidth, 20);
+      ctx.fillStyle = '#27ae60';
+      ctx.fillRect(playerHpBarX, playerHpBarY, playerHpBarWidth * playerHpPercent / 100, 20);
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(playerHpBarX, playerHpBarY, playerHpBarWidth, 20);
+
+      ctx.fillStyle = '#fff';
+      ctx.font = '14px Microsoft YaHei';
+      ctx.textAlign = 'center';
+      ctx.fillText(`HP: ${player.hp}/${player.maxHp}`, playerX, playerHpBarY + 35);
+
+      // 怪物信息（右侧）
+      const monsterX = canvas.width * 0.75;
+      const monsterY = canvas.height * 0.4;
+
+      // 怪物圆圈
+      ctx.beginPath();
+      ctx.arc(monsterX, monsterY, 60, 0, Math.PI * 2);
+      ctx.fillStyle = '#e74c3c';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      // 怪物图标
+      ctx.fillStyle = '#fff';
+      ctx.font = '48px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('👾', monsterX, monsterY + 15);
+
+      // 怪物名字
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 20px Microsoft YaHei';
+      ctx.fillText(battleState.monsterName, monsterX, monsterY + 90);
+
+      // 怪物血条
+      const monsterHpPercent = (battleState.monsterHp / battleState.monsterMaxHp) * 100;
+      const monsterHpBarWidth = 200;
+      const monsterHpBarX = monsterX - monsterHpBarWidth / 2;
+      const monsterHpBarY = monsterY + 110;
+
+      ctx.fillStyle = '#333';
+      ctx.fillRect(monsterHpBarX, monsterHpBarY, monsterHpBarWidth, 20);
+      ctx.fillStyle = '#e74c3c';
+      ctx.fillRect(monsterHpBarX, monsterHpBarY, monsterHpBarWidth * monsterHpPercent / 100, 20);
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(monsterHpBarX, monsterHpBarY, monsterHpBarWidth, 20);
+
+      ctx.fillStyle = '#fff';
+      ctx.font = '14px Microsoft YaHei';
+      ctx.textAlign = 'center';
+      ctx.fillText(`HP: ${battleState.monsterHp}/${battleState.monsterMaxHp}`, monsterX, monsterHpBarY + 35);
+
+      // 战斗操作提示
+      ctx.fillStyle = '#aaa';
+      ctx.font = '16px Microsoft YaHei';
+      ctx.textAlign = 'left';
+      ctx.fillText('1. 普通攻击', 50, canvas.height - 120);
+      ctx.fillText('2. 技能攻击', 50, canvas.height - 90);
+      ctx.fillText('空格. 逃跑', 50, canvas.height - 60);
+
+      // 战斗日志
+      if (battleState.battleLog && battleState.battleLog.length > 0) {
+        const logStartY = 120;
+        const logX = canvas.width / 2;
+
+        ctx.fillStyle = '#f093fb';
+        ctx.font = 'bold 16px Microsoft YaHei';
+        ctx.textAlign = 'center';
+        ctx.fillText('战斗日志', logX, logStartY);
+
+        ctx.fillStyle = '#fff';
+        ctx.font = '14px Microsoft YaHei';
+        const lastLogs = battleState.battleLog.slice(-5); // 显示最后5条
+        lastLogs.forEach((log, index) => {
+          ctx.fillText(log, logX, logStartY + 30 + index * 25);
+        });
+      }
     }
 
     // 渲染对话框
@@ -1837,12 +1950,177 @@
 
       // 战斗阶段的键盘处理
       if (gameState.gamePhase === 'battle') {
-        // TODO: 添加战斗键盘处理
-        // 1：普通攻击
-        // 2-5：技能
-        // Space：逃跑
+        if (!gameState.battleState) return;
+
+        const key = e.key;
+
+        switch (key) {
+          case '1':
+            // 普通攻击
+            performAttack();
+            break;
+
+          case '2':
+            // 技能攻击（如果有技能）
+            if (player.skills && player.skills.length > 0) {
+              performSkillAttack(player.skills[0].id);
+            } else {
+              showToast('还没有技能');
+            }
+            break;
+
+          case '3':
+            // 第二个技能
+            if (player.skills && player.skills.length > 1) {
+              performSkillAttack(player.skills[1].id);
+            }
+            break;
+
+          case '4':
+            // 第三个技能
+            if (player.skills && player.skills.length > 2) {
+              performSkillAttack(player.skills[2].id);
+            }
+            break;
+
+          case ' ':
+            // 空格：逃跑
+            tryEscape();
+            break;
+        }
       }
     });
+
+    // 普通攻击
+    function performAttack() {
+      if (!gameState || !gameState.battleState) return;
+
+      const battleState = gameState.battleState;
+      const player = gameState.player;
+
+      // 玩家攻击怪物
+      const damage = Math.max(1, player.attack - 0); // TODO: 减去怪物防御
+      battleState.monsterHp -= damage;
+
+      // 添加战斗日志
+      battleState.battleLog.push(`${player.name} 攻击了 ${battleState.monsterName}，造成 ${damage} 点伤害！`);
+
+      // 检查怪物是否死亡
+      if (battleState.monsterHp <= 0) {
+        // 战斗胜利
+        battleWin();
+        return;
+      }
+
+      // 怪物攻击玩家
+      const monsterDamage = Math.max(1, battleState.monsterAttack - player.defense);
+      player.hp -= monsterDamage;
+
+      // 添加战斗日志
+      battleState.battleLog.push(`${battleState.monsterName} 攻击了 ${player.name}，造成 ${monsterDamage} 点伤害！`);
+
+      // 检查玩家是否死亡
+      if (player.hp <= 0) {
+        // 战斗失败
+        battleLose();
+        return;
+      }
+
+      updateUI();
+    }
+
+    // 技能攻击
+    function performSkillAttack(skillId) {
+      if (!gameState || !gameState.battleState) return;
+
+      // TODO: 实现技能系统
+      showToast('技能系统开发中...');
+    }
+
+    // 逃跑
+    function tryEscape() {
+      if (!gameState || !gameState.battleState) return;
+
+      // 50% 几率逃跑成功
+      if (Math.random() < 0.5) {
+        gameState.gamePhase = 'playing';
+        gameState.battleState = null;
+        showToast('逃跑成功！');
+        updateUI();
+      } else {
+        // 逃跑失败，怪物攻击
+        const battleState = gameState.battleState;
+        const player = gameState.player;
+        const monsterDamage = Math.max(1, battleState.monsterAttack - player.defense);
+        player.hp -= monsterDamage;
+
+        battleState.battleLog.push(`逃跑失败！${battleState.monsterName} 攻击了 ${player.name}，造成 ${monsterDamage} 点伤害！`);
+
+        if (player.hp <= 0) {
+          battleLose();
+        } else {
+          showToast('逃跑失败！');
+          updateUI();
+        }
+      }
+    }
+
+    // 战斗胜利
+    function battleWin() {
+      if (!gameState || !gameState.battleState) return;
+
+      const battleState = gameState.battleState;
+      const player = gameState.player;
+
+      // TODO: 根据怪物类型给予奖励
+      const expReward = 20;
+      const goldReward = 10;
+
+      player.exp += expReward;
+      player.gold += goldReward;
+
+      // 检查升级
+      if (player.exp >= player.expToNextLevel) {
+        player.level++;
+        player.exp -= player.expToNextLevel;
+        player.expToNextLevel = Math.floor(player.expToNextLevel * 1.5);
+        player.maxHp += 10;
+        player.hp = player.maxHp;
+        player.attack += 2;
+        player.defense += 1;
+        showToast(`战斗胜利！升级了！现在是 ${player.level} 级`);
+      } else {
+        showToast(`战斗胜利！获得 ${expReward} 经验和 ${goldReward} 金币`);
+      }
+
+      // 更新任务进度（如果有杀怪任务）
+      // TODO: 实现任务进度更新
+
+      gameState.gamePhase = 'playing';
+      gameState.battleState = null;
+
+      updateUI();
+    }
+
+    // 战斗失败
+    function battleLose() {
+      if (!gameState || !gameState.battleState) return;
+
+      const player = gameState.player;
+      player.hp = 0;
+
+      showToast('战斗失败！回到村庄恢复...');
+
+      // 回到村庄
+      gameState.currentMap = 'village';
+      player.position = { x: 400, y: 300 };
+      player.hp = player.maxHp; // 恢复满血
+
+      gameState.gamePhase = 'playing';
+      gameState.battleState = null;
+
+      updateUI();
+    }
 
     // 处理对话选项
     function handleDialogueOption(option) {
