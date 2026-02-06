@@ -1223,6 +1223,7 @@
         gameLoop();
       } catch (error) {
         console.error('初始化失败:', error);
+        hideLoading(); // 隐藏加载界面
         showToast('初始化失败: ' + error.message);
       }
     }
