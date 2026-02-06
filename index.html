@@ -1179,6 +1179,13 @@
         // 检查所有 localStorage keys
         console.log('[initGame] localStorage keys:', Object.keys(localStorage));
 
+        // 添加加载超时保护（10 秒超时）
+        const timeoutId = setTimeout(() => {
+          console.error('[initGame] 加载超时（10秒）');
+          hideLoading();
+          alert('加载超时，请刷新页面重试');
+        }, 10000);
+
         // 检查是否有角色
         const savedCharacter = localStorage.getItem('character');
         console.log('[initGame] savedCharacter:', savedCharacter ? '存在' : '不存在');
@@ -1234,6 +1241,9 @@
 
         showLoading('完成!', 100);
 
+        // 清除超时定时器
+        clearTimeout(timeoutId);
+
         // 隐藏加载界面
         setTimeout(() => {
           hideLoading();
@@ -1244,6 +1254,10 @@
         gameLoop();
       } catch (error) {
         console.error('[initGame] 初始化失败:', error);
+
+        // 清除超时定时器
+        clearTimeout(timeoutId);
+
         hideLoading(); // 隐藏加载界面
         showToast('初始化失败: ' + error.message);
       }
