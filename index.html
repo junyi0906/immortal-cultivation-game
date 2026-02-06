@@ -2203,8 +2203,12 @@
       const battleState = gameState.battleState;
       const player = gameState.player;
 
-      // 玩家攻击怪物
-      const damage = Math.max(1, player.attack - 0); // TODO: 减去怪物防御
+      // 获取怪物防御力
+      const monsterData = MONSTER_DATA[battleState.monsterId];
+      const monsterDefense = monsterData ? monsterData.defense : 0;
+
+      // 玩家攻击怪物（减去怪物防御）
+      const damage = Math.max(1, player.attack - monsterDefense);
       battleState.monsterHp -= damage;
 
       // 添加战斗日志
