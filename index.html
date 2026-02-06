@@ -1174,9 +1174,17 @@
     async function initGame() {
       try {
         console.log('[initGame] 开始初始化游戏...');
+        console.log('[initGame] localStorage 可用:', typeof localStorage !== 'undefined');
+
+        // 检查所有 localStorage keys
+        console.log('[initGame] localStorage keys:', Object.keys(localStorage));
+
         // 检查是否有角色
         const savedCharacter = localStorage.getItem('character');
         console.log('[initGame] savedCharacter:', savedCharacter ? '存在' : '不存在');
+        if (savedCharacter) {
+          console.log('[initGame] savedCharacter 内容:', savedCharacter);
+        }
 
         if (!savedCharacter) {
           // 没有角色，显示角色创建界面
