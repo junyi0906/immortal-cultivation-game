@@ -958,6 +958,9 @@
 
   <script type="module">
     import coordinatorAPI from './js/coordinator-api.js';
+    import { MAP_DATA } from './js/map-system.js';
+    import { NPC_DATA } from './js/npc-agent.js';
+    import { MONSTER_DATA } from './js/battle-agent.js';
 
     // 全局变量
     let gameState = null;
@@ -1197,26 +1200,82 @@
 
     // 更新逻辑
     function update() {
-      // 游戏逻辑更新
+      if (!gameState) return;
+
+      // 检查是否在战斗中
+      if (gameState.gamePhase === 'battle') {
+        // 战斗逻辑在 battle 系统中处理
+        return;
+      }
+
+      // 检查是否在对话中
+      if (gameState.gamePhase === 'dialog') {
+        // 对话逻辑在 NPC 系统中处理
+        return;
+      }
     }
 
     // 渲染
     function render() {
+      if (!gameState) return;
+
       // 清空画布
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // 渲染游戏场景
-      renderScene();
+      // 根据游戏阶段渲染不同内容
+      if (gameState.gamePhase === 'battle') {
+        renderBattle();
+      } else if (gameState.gamePhase === 'dialog') {
+        renderScene(); // 渲染背景场景
+        renderDialog(); // 渲染对话框
+      } else {
+        renderScene(); // 正常游戏场景
+      }
     }
 
     // 渲染场景
     function renderScene() {
+      if (!gameState) return;
+
       // 绘制背景
       ctx.fillStyle = '#1a1a2e';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+      // 绘制地图信息
+      const currentMapId = gameState.currentMap;
+      if (!currentMapId) return;
+
+      // TODO: 加载地图背景图片
+      // 目前使用纯色背景
+      const mapColors = {
+        'village': '#2d5a27', // 绿色
+        'forest': '#1a3d0e', // 深绿
+        'cave': '#3d3d3d', // 灰色
+        'desert': '#c2b280', // 沙色
+        'snow': '#e6e6e6', // 白色
+        'volcano': '#4a1c1c', // 暗红
+        'demon_palace': '#1a1a2e' // 深蓝
+      };
+      ctx.fillStyle = mapColors[currentMapId] || '#1a1a2e';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // 绘制地图名称
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.font = 'bold 24px Microsoft YaHei';
+      ctx.textAlign = 'center';
+      const mapNames = {
+        'village': '新手村',
+        'forest': '森林',
+        'cave': '山洞',
+        'desert': '沙漠',
+        'snow': '冰原',
+        'volcano': '火山',
+        'demon_palace': '魔宫'
+      };
+      ctx.fillText(mapNames[currentMapId] || currentMapId, canvas.width / 2, 50);
+
       // 绘制玩家位置
-      if (gameState && gameState.player && gameState.player.position) {
+      if (gameState.player && gameState.player.position) {
         const pos = gameState.player.position;
 
         // 绘制玩家
@@ -1234,6 +1293,134 @@
         ctx.textAlign = 'center';
         ctx.fillText(gameState.player.name || '玩家', pos.x, pos.y - 30);
       }
+
+      // 绘制 NPC
+      if (currentMap.npcs) {
+        for (const npc of currentMap.npcs) {
+          const npcData = NPC_DATA[npc.npcId];
+          if (!npcData) continue;
+
+          // NPC 圆圈
+          ctx.beginPath();
+          ctx.arc(npc.x, npc.y, 25, 0, Math.PI * 2);
+          ctx.fillStyle = '#9b59b6';
+          ctx.fill();
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          // NPC 图标
+          ctx.fillStyle = '#fff';
+          ctx.font = '24px Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText('👤', npc.x, npc.y + 8);
+
+          // NPC 名字
+          ctx.fillStyle = '#fff';
+          ctx.font = '14px Microsoft YaHei';
+          ctx.fillText(npcData.name, npc.x, npc.y - 35);
+        }
+      }
+
+      // 绘制传送点
+      if (currentMap.portals) {
+        for (const portal of currentMap.portals) {
+          const targetMap = MAP_DATA[portal.targetMapId];
+          if (!targetMap) continue;
+
+          // 传送点圆圈
+          ctx.beginPath();
+          ctx.arc(portal.x, portal.y, 30, 0, Math.PI * 2);
+          ctx.fillStyle = targetMap.unlocked ? '#3498db' : '#7f8c8d';
+          ctx.fill();
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          // 传送点图标
+          ctx.fillStyle = '#fff';
+          ctx.font = '24px Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText('🌀', portal.x, portal.y + 8);
+
+          // 传送点名字
+          ctx.fillStyle = '#fff';
+          ctx.font = '12px Microsoft YaHei';
+          ctx.fillText(targetMap.name, portal.x, portal.y - 40);
+        }
+      }
+
+      // 绘制怪物
+      if (currentMap.monsters) {
+        for (const monster of currentMap.monsters) {
+          const monsterData = MONSTER_DATA[monster.monsterType];
+          if (!monsterData) continue;
+
+          // 怪物圆圈
+          ctx.beginPath();
+          ctx.arc(monster.x, monster.y, 25, 0, Math.PI * 2);
+          ctx.fillStyle = '#e74c3c';
+          ctx.fill();
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          // 怪物图标
+          ctx.fillStyle = '#fff';
+          ctx.font = '24px Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText('👾', monster.x, monster.y + 8);
+
+          // 怪物名字
+          ctx.fillStyle = '#fff';
+          ctx.font = '12px Microsoft YaHei';
+          ctx.fillText(monsterData.name, monster.x, monster.y - 35);
+        }
+      }
+    }
+
+    // 渲染战斗场景
+    function renderBattle() {
+      // 战斗背景
+      ctx.fillStyle = '#2c2c54';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // 战斗 UI
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 32px Microsoft YaHei';
+      ctx.textAlign = 'center';
+      ctx.fillText('战斗中...', canvas.width / 2, 100);
+
+      // TODO: 渲染战斗角色和怪物
+      // TODO: 渲染血条
+      // TODO: 渲染技能按钮
+    }
+
+    // 渲染对话框
+    function renderDialog() {
+      // 对话框背景
+      const dialogHeight = 200;
+      const dialogY = canvas.height - dialogHeight;
+
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+      ctx.fillRect(50, dialogY, canvas.width - 100, dialogHeight - 20);
+
+      ctx.strokeStyle = '#667eea';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(50, dialogY, canvas.width - 100, dialogHeight - 20);
+
+      // NPC 名字
+      ctx.fillStyle = '#f093fb';
+      ctx.font = 'bold 20px Microsoft YaHei';
+      ctx.textAlign = 'left';
+      ctx.fillText('NPC 名字', 70, dialogY + 35);
+
+      // 对话内容
+      ctx.fillStyle = '#fff';
+      ctx.font = '16px Microsoft YaHei';
+      ctx.fillText('对话内容...', 70, dialogY + 80);
+
+      // TODO: 渲染对话选项
     }
 
     // 更新 UI
@@ -1454,7 +1641,7 @@
       }, 3000);
     }
 
-    // 点击画布移动玩家
+    // 点击画布处理
     canvas.addEventListener('click', async (e) => {
       if (!gameState) return;
 
@@ -1463,10 +1650,99 @@
       const y = e.clientY - rect.top;
 
       try {
+        // 检查游戏阶段
+        if (gameState.gamePhase === 'battle') {
+          // 战斗中，不处理点击
+          return;
+        }
+
+        if (gameState.gamePhase === 'dialog') {
+          // 对话中，不处理点击
+          return;
+        }
+
+        // 获取当前地图
+        const currentMapId = gameState.currentMap;
+        const currentMap = MAP_DATA[currentMapId];
+        if (!currentMap) return;
+
+        // 检测点击 NPC
+        if (currentMap.npcs) {
+          for (const npc of currentMap.npcs) {
+            const distance = Math.sqrt(Math.pow(x - npc.x, 2) + Math.pow(y - npc.y, 2));
+            if (distance < 30) { // 点击半径
+              // 点击了 NPC，触发对话
+              const npcData = NPC_DATA[npc.npcId];
+              if (npcData) {
+                gameState.gamePhase = 'dialog';
+                gameState.currentNPC = npc.npcId;
+                gameState.dialogQueue = npcData.dialogues || [];
+                showToast(`与 ${npcData.name} 对话中`);
+                updateUI();
+                return;
+              }
+            }
+          }
+        }
+
+        // 检测点击传送点
+        if (currentMap.portals) {
+          for (const portal of currentMap.portals) {
+            const distance = Math.sqrt(Math.pow(x - portal.x, 2) + Math.pow(y - portal.y, 2));
+            if (distance < 30) { // 点击半径
+              // 点击了传送点，切换地图
+              if (portal.targetMapId && MAP_DATA[portal.targetMapId]) {
+                const targetMap = MAP_DATA[portal.targetMapId];
+
+                // 检查是否解锁
+                if (targetMap.unlocked) {
+                  gameState.currentMap = portal.targetMapId;
+                  // 重置玩家位置到地图中心
+                  gameState.player.position = { x: 300, y: 300 };
+                  showToast(`进入 ${targetMap.name}`);
+                  updateUI();
+                  return;
+                } else {
+                  showToast(`地图 ${targetMap.name} 未解锁`);
+                  return;
+                }
+              }
+            }
+          }
+        }
+
+        // 检测点击怪物
+        if (currentMap.monsters) {
+          for (const monster of currentMap.monsters) {
+            const distance = Math.sqrt(Math.pow(x - monster.x, 2) + Math.pow(y - monster.y, 2));
+            if (distance < 30) { // 点击半径
+              // 点击了怪物，开始战斗
+              const monsterData = MONSTER_DATA[monster.monsterType];
+              if (monsterData) {
+                gameState.gamePhase = 'battle';
+                gameState.battleState = {
+                  monsterId: monster.monsterType,
+                  monsterName: monsterData.name,
+                  monsterHp: monsterData.hp,
+                  monsterMaxHp: monsterData.hp,
+                  monsterAttack: monsterData.attack,
+                  playerHp: gameState.player.hp,
+                  playerMaxHp: gameState.player.maxHp,
+                  battleLog: [`遇到 ${monsterData.name}！`]
+                };
+                showToast(`战斗开始！${monsterData.name}`);
+                updateUI();
+                return;
+              }
+            }
+          }
+        }
+
+        // 移动玩家
         await coordinatorAPI.playerMove(x, y, 'down');
         updateUI();
       } catch (error) {
-        showToast('移动失败: ' + error.message);
+        showToast('操作失败: ' + error.message);
       }
     });
 
