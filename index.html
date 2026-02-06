@@ -630,6 +630,127 @@
       background: rgba(255, 255, 255, 0.2);
     }
 
+    /* ==================== 通关界面 ==================== */
+    .victory-screen {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .victory-container {
+      width: 900px;
+      max-width: 95%;
+      background: rgba(0, 0, 0, 0.85);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      border: 2px solid rgba(240, 147, 251, 0.3);
+    }
+
+    .victory-title {
+      font-size: 48px;
+      text-align: center;
+      margin-bottom: 30px;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .victory-content {
+      text-align: center;
+    }
+
+    .victory-message {
+      margin-bottom: 30px;
+    }
+
+    .victory-message p {
+      font-size: 18px;
+      color: #fff;
+      margin: 10px 0;
+      line-height: 1.6;
+    }
+
+    .victory-stats {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(240, 147, 251, 0.2);
+    }
+
+    .victory-stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      margin: 8px 0;
+      font-size: 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .victory-stat-row:last-child {
+      border-bottom: none;
+    }
+
+    .victory-stat-row .stat-label {
+      color: #f093fb;
+      font-weight: bold;
+    }
+
+    .victory-stat-row .stat-value {
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .victory-stat-row.final-score {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 2px solid rgba(240, 147, 251, 0.3);
+    }
+
+    .victory-stat-row.final-score .stat-label {
+      font-size: 20px;
+      color: #f5576c;
+    }
+
+    .victory-stat-row.final-score .stat-value {
+      font-size: 24px;
+      color: #f5576c;
+    }
+
+    .victory-actions {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .victory-actions .btn {
+      padding: 15px 40px;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .victory-actions .btn.primary {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: #fff;
+    }
+
+    .victory-actions .btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(240, 147, 251, 0.4);
+    }
+
     /* ==================== 加载界面 ==================== */
     .loading-screen {
       position: absolute;
@@ -964,6 +1085,47 @@
         </div>
       </div>
     </div>
+
+    <!-- 通关界面 -->
+    <div class="victory-screen" id="victory-screen" style="display: none;">
+      <div class="victory-container">
+        <h1 class="victory-title">🎉 恭喜通关！🎉</h1>
+
+        <div class="victory-content">
+          <div class="victory-message">
+            <p>你成功击败了魔王，拯救了世界！</p>
+            <p>你的英勇事迹将永远被后人铭记！</p>
+          </div>
+
+          <div class="victory-stats">
+            <div class="victory-stat-row">
+              <span class="stat-label">角色名字:</span>
+              <span class="stat-value" id="victory-player-name">-</span>
+            </div>
+            <div class="victory-stat-row">
+              <span class="stat-label">最终等级:</span>
+              <span class="stat-value" id="victory-player-level">-</span>
+            </div>
+            <div class="victory-stat-row">
+              <span class="stat-label">金币:</span>
+              <span class="stat-value" id="victory-player-gold">-</span>
+            </div>
+            <div class="victory-stat-row">
+              <span class="stat-label">经验值:</span>
+              <span class="stat-value" id="victory-player-exp">-</span>
+            </div>
+            <div class="victory-stat-row final-score">
+              <span class="stat-label">最终得分:</span>
+              <span class="stat-value" id="victory-final-score">-</span>
+            </div>
+          </div>
+
+          <div class="victory-actions">
+            <button class="btn primary" onclick="restartGame()">重新开始</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script type="module">
@@ -1233,7 +1395,10 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // 根据游戏阶段渲染不同内容
-      if (gameState.gamePhase === 'battle') {
+      if (gameState.gamePhase === 'victory') {
+        // 通关阶段，不渲染 canvas 内容，显示 HTML 通关界面
+        return;
+      } else if (gameState.gamePhase === 'battle') {
         renderBattle();
       } else if (gameState.gamePhase === 'dialog') {
         renderScene(); // 渲染背景场景
@@ -2189,9 +2354,13 @@
       const battleState = gameState.battleState;
       const player = gameState.player;
 
-      // TODO: 根据怪物类型给予奖励
-      const expReward = 20;
-      const goldReward = 10;
+      // 检查是否击败了最终 BOSS
+      const isFinalBoss = gameState.currentMap === 'demon_palace' && battleState.monsterId === 'boss';
+
+      // 根据怪物类型给予奖励
+      const monsterData = MONSTER_DATA[battleState.monsterId];
+      const expReward = monsterData ? monsterData.exp : 20;
+      const goldReward = monsterData ? monsterData.gold : 10;
 
       player.exp += expReward;
       player.gold += goldReward;
@@ -2216,6 +2385,12 @@
         showToast(`战斗胜利！获得 ${expReward} 经验和 ${goldReward} 金币`);
       }
 
+      // 如果击败了最终 BOSS，显示通关画面
+      if (isFinalBoss) {
+        showVictoryScreen();
+        return;
+      }
+
       // 更新任务进度（如果有杀怪任务）
       // TODO: 实现任务进度更新
 
@@ -2223,6 +2398,44 @@
       gameState.battleState = null;
 
       updateUI();
+    }
+
+    // 显示通关画面
+    function showVictoryScreen() {
+      gameState.gamePhase = 'victory';
+
+      const victoryScreen = document.getElementById('victory-screen');
+      if (victoryScreen) {
+        victoryScreen.style.display = 'flex';
+
+        // 更新通关信息
+        const player = gameState.player;
+        const finalScore = player.level * 100 + player.gold + player.exp;
+
+        document.getElementById('victory-player-name').textContent = player.name || '玩家';
+        document.getElementById('victory-player-level').textContent = player.level;
+        document.getElementById('victory-player-gold').textContent = player.gold;
+        document.getElementById('victory-player-exp').textContent = player.exp;
+        document.getElementById('victory-final-score').textContent = finalScore;
+
+        // 播放通关音效（如果有）
+        // TODO: 添加通关音效
+      }
+    }
+
+    // 重新开始游戏
+    function restartGame() {
+      // 清空角色数据
+      localStorage.removeItem('character');
+
+      // 清空游戏状态
+      gameState = null;
+
+      // 隐藏通关画面
+      document.getElementById('victory-screen').style.display = 'none';
+
+      // 重新初始化游戏
+      initGame();
     }
 
     // 战斗失败
