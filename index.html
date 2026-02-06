@@ -1206,6 +1206,9 @@
 
         // 初始化画布
         canvas = document.getElementById('game-canvas');
+        if (!canvas) {
+          throw new Error('Canvas 元素不存在');
+        }
         ctx = canvas.getContext('2d');
         resizeCanvas();
         console.log('[initGame] 初始化画布完成');
