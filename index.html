@@ -115,6 +115,10 @@
       background: linear-gradient(90deg, #c0392b, #e74c3c);
     }
 
+    .mp-bar .bar-fill {
+      background: linear-gradient(90deg, #8e44ad, #9b59b6);
+    }
+
     .exp-bar .bar-fill {
       background: linear-gradient(90deg, #2980b9, #3498db);
     }
@@ -733,6 +737,12 @@
               <div class="bar-fill" id="hp-bar-fill" style="width: 100%;"></div>
             </div>
             <div class="bar-text" id="hp-bar-text">HP: 100/100</div>
+          </div>
+          <div class="bar-container">
+            <div class="bar mp-bar">
+              <div class="bar-fill" id="mp-bar-fill" style="width: 100%;"></div>
+            </div>
+            <div class="bar-text" id="mp-bar-text">MP: 50/50</div>
           </div>
           <div class="bar-container">
             <div class="bar exp-bar">
@@ -1439,6 +1449,21 @@
       ctx.textAlign = 'center';
       ctx.fillText(`HP: ${player.hp}/${player.maxHp}`, playerX, playerHpBarY + 35);
 
+      // 玩家法力条
+      const playerMpPercent = (player.mp / player.maxMp) * 100;
+      const playerMpBarY = playerHpBarY + 50;
+
+      ctx.fillStyle = '#333';
+      ctx.fillRect(playerHpBarX, playerMpBarY, playerHpBarWidth, 20);
+      ctx.fillStyle = '#9b59b6';
+      ctx.fillRect(playerHpBarX, playerMpBarY, playerHpBarWidth * playerMpPercent / 100, 20);
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(playerHpBarX, playerMpBarY, playerHpBarWidth, 20);
+
+      ctx.fillStyle = '#fff';
+      ctx.fillText(`MP: ${player.mp}/${player.maxMp}`, playerX, playerMpBarY + 35);
+
       // 怪物信息（右侧）
       const monsterX = canvas.width * 0.75;
       const monsterY = canvas.height * 0.4;
@@ -1598,6 +1623,11 @@
       const hpPercent = (player.hp / player.maxHp) * 100;
       document.getElementById('hp-bar-fill').style.width = hpPercent + '%';
       document.getElementById('hp-bar-text').textContent = `HP: ${player.hp}/${player.maxHp}`;
+
+      // 更新法力条
+      const mpPercent = (player.mp / player.maxMp) * 100;
+      document.getElementById('mp-bar-fill').style.width = mpPercent + '%';
+      document.getElementById('mp-bar-text').textContent = `MP: ${player.mp}/${player.maxMp}`;
 
       // 更新经验条
       const expPercent = (player.exp / player.expToNextLevel) * 100;
