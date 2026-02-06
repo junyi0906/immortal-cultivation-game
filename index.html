@@ -1511,8 +1511,18 @@
       ctx.fillStyle = '#aaa';
       ctx.font = '16px Microsoft YaHei';
       ctx.textAlign = 'left';
-      ctx.fillText('1. 普通攻击', 50, canvas.height - 120);
-      ctx.fillText('2. 技能攻击', 50, canvas.height - 90);
+      ctx.fillText('1. 普通攻击', 50, canvas.height - 180);
+
+      // 技能按钮
+      if (player.skills && player.skills.length > 0) {
+        // 显示玩家已学习的技能
+        const skillLabels = ['2', '3', '4'];
+        player.skills.slice(0, 3).forEach((skillId, index) => {
+          // TODO: 从技能数据获取技能名称
+          ctx.fillText(`${skillLabels[index]}. 技能攻击`, 50, canvas.height - 150 + index * 30);
+        });
+      }
+
       ctx.fillText('空格. 逃跑', 50, canvas.height - 60);
 
       // 战斗日志
@@ -2063,8 +2073,60 @@
     function performSkillAttack(skillId) {
       if (!gameState || !gameState.battleState) return;
 
-      // TODO: 实现技能系统
-      showToast('技能系统开发中...');
+      const battleState = gameState.battleState;
+      const player = gameState.player;
+
+      // 检查玩家是否有这个技能
+      if (!player.skills || !player.skills.includes(skillId)) {
+        showToast('你没有这个技能！');
+        return;
+      }
+
+      // 检查法力值是否足够
+      // TODO: 从技能数据获取法力消耗
+      const mpCost = 10; // 默认消耗
+      if (player.mp < mpCost) {
+        showToast('法力值不足！');
+        return;
+      }
+
+      // 扣除法力值
+      player.mp -= mpCost;
+
+      // 计算技能伤害
+      // TODO: 从技能数据获取伤害
+      const baseDamage = player.attack;
+      const skillMultiplier = 2; // 技能伤害倍数
+      const damage = Math.floor(baseDamage * skillMultiplier);
+
+      // 怪物受伤
+      battleState.monsterHp -= damage;
+
+      // 添加战斗日志
+      battleState.battleLog.push(`${player.name} 使用技能攻击了 ${battleState.monsterName}，造成 ${damage} 点伤害！`);
+
+      // 检查怪物是否死亡
+      if (battleState.monsterHp <= 0) {
+        // 战斗胜利
+        battleWin();
+        return;
+      }
+
+      // 怪物攻击玩家
+      const monsterDamage = Math.max(1, battleState.monsterAttack - player.defense);
+      player.hp -= monsterDamage;
+
+      // 添加战斗日志
+      battleState.battleLog.push(`${battleState.monsterName} 攻击了 ${player.name}，造成 ${monsterDamage} 点伤害！`);
+
+      // 检查玩家是否死亡
+      if (player.hp <= 0) {
+        // 战斗失败
+        battleLose();
+        return;
+      }
+
+      updateUI();
     }
 
     // 逃跑
