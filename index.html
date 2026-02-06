@@ -2571,8 +2571,13 @@
       updateUI();
     }
 
-    // 初始化游戏
-    window.addEventListener('load', initGame);
+    // 初始化游戏（等待 DOM 加载完成）
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initGame);
+    } else {
+      // DOM 已经加载完成，直接初始化
+      initGame();
+    }
 
     // 导出全局函数（用于调试）
     window.coordinatorAPI = coordinatorAPI;
