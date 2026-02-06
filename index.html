@@ -1173,21 +1173,26 @@
     // 初始化游戏
     async function initGame() {
       try {
+        console.log('[initGame] 开始初始化游戏...');
         // 检查是否有角色
         const savedCharacter = localStorage.getItem('character');
+        console.log('[initGame] savedCharacter:', savedCharacter ? '存在' : '不存在');
 
         if (!savedCharacter) {
           // 没有角色，显示角色创建界面
           document.getElementById('loading-screen').style.display = 'none';
           document.getElementById('character-creation-screen').style.display = 'flex';
+          console.log('[initGame] 显示角色创建界面');
           return;
         }
 
         // 有角色，加载角色数据
         showLoading('初始化游戏...', 10);
+        console.log('[initGame] 调用 coordinatorAPI.initGame()...');
 
         // 初始化协调 Agent
         gameState = await coordinatorAPI.initGame();
+        console.log('[initGame] coordinatorAPI.initGame() 完成, gameState:', gameState);
 
         // 加载角色数据
         const character = JSON.parse(savedCharacter);
@@ -1195,6 +1200,7 @@
           ...gameState.player,
           ...character
         };
+        console.log('[initGame] 加载角色数据完成, player:', gameState.player);
 
         showLoading('加载资源...', 30);
 
@@ -1202,27 +1208,31 @@
         canvas = document.getElementById('game-canvas');
         ctx = canvas.getContext('2d');
         resizeCanvas();
+        console.log('[initGame] 初始化画布完成');
 
         showLoading('准备游戏...', 60);
 
         // 显示 UI
         document.getElementById('status-bar').style.display = 'flex';
         document.getElementById('button-bar').style.display = 'flex';
+        console.log('[initGame] 显示 UI');
 
         // 更新 UI
         updateUI();
+        console.log('[initGame] 更新 UI 完成');
 
         showLoading('完成!', 100);
 
         // 隐藏加载界面
         setTimeout(() => {
           hideLoading();
+          console.log('[initGame] 隐藏加载界面，开始游戏');
         }, 500);
 
         // 开始游戏循环
         gameLoop();
       } catch (error) {
-        console.error('初始化失败:', error);
+        console.error('[initGame] 初始化失败:', error);
         hideLoading(); // 隐藏加载界面
         showToast('初始化失败: ' + error.message);
       }
