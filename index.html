@@ -2580,6 +2580,12 @@
       updateUI();
     }
 
+    // 全局错误捕获
+    window.addEventListener('error', function(e) {
+      console.error('[全局错误]', e.error);
+      alert('发生错误: ' + (e.error && e.error.message));
+    });
+
     // 初始化游戏（等待 DOM 加载完成）
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initGame);
