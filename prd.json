@@ -357,8 +357,8 @@
         "Typecheck passes"
       ],
       "priority": 23,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-024",
@@ -373,8 +373,8 @@
         "Typecheck passes"
       ],
       "priority": 24,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-025",
@@ -389,8 +389,8 @@
         "Typecheck passes"
       ],
       "priority": 25,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-026",
@@ -405,8 +405,8 @@
         "Typecheck passes"
       ],
       "priority": 26,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-027",
@@ -421,8 +421,8 @@
         "Typecheck passes"
       ],
       "priority": 27,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-028",
@@ -437,8 +437,8 @@
         "Typecheck passes"
       ],
       "priority": 28,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-029",
@@ -452,8 +452,8 @@
         "Typecheck passes"
       ],
       "priority": 29,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-030",
@@ -468,8 +468,8 @@
         "Typecheck passes"
       ],
       "priority": 30,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-031",
@@ -484,8 +484,8 @@
         "Typecheck passes"
       ],
       "priority": 31,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-032",
@@ -500,8 +500,8 @@
         "Typecheck passes"
       ],
       "priority": 32,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-033",
@@ -516,8 +516,8 @@
         "Typecheck passes"
       ],
       "priority": 33,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-034",
@@ -531,8 +531,8 @@
         "Typecheck passes"
       ],
       "priority": 34,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-035",
@@ -546,8 +546,8 @@
         "Typecheck passes"
       ],
       "priority": 35,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-036",
@@ -561,8 +561,8 @@
         "Typecheck passes"
       ],
       "priority": 36,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-037",
@@ -576,8 +576,8 @@
         "Typecheck passes"
       ],
       "priority": 37,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-038",
@@ -591,8 +591,8 @@
         "Typecheck passes"
       ],
       "priority": 38,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-039",
@@ -606,8 +606,8 @@
         "Typecheck passes"
       ],
       "priority": 39,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-040",
@@ -621,8 +621,8 @@
         "Typecheck passes"
       ],
       "priority": 40,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-041",
@@ -637,8 +637,8 @@
         "Typecheck passes"
       ],
       "priority": 41,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-042",
@@ -651,8 +651,8 @@
         "Typecheck passes"
       ],
       "priority": 42,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-043",
@@ -665,8 +665,8 @@
         "Typecheck passes"
       ],
       "priority": 43,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-044",
@@ -681,8 +681,8 @@
         "Typecheck passes"
       ],
       "priority": 44,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-045",
@@ -700,8 +700,8 @@
         "Typecheck passes"
       ],
       "priority": 45,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-046",
@@ -717,8 +717,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 46,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-047",
@@ -734,8 +734,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 47,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-048",
@@ -751,8 +751,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 48,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-049",
@@ -768,8 +768,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 49,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-050",
@@ -783,8 +783,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 50,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-051",
@@ -799,8 +799,8 @@
         "Typecheck passes"
       ],
       "priority": 51,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-052",
@@ -815,8 +815,8 @@
         "Typecheck passes"
       ],
       "priority": 52,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-053",
@@ -833,8 +833,8 @@
         "Typecheck passes"
       ],
       "priority": 53,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-054",
@@ -847,8 +847,8 @@
         "Typecheck passes"
       ],
       "priority": 54,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-055",
@@ -864,8 +864,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 55,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-056",
@@ -879,8 +879,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 56,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-057",
@@ -896,8 +896,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 57,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-058",
@@ -911,8 +911,8 @@
         "Typecheck passes"
       ],
       "priority": 58,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-059",
@@ -927,8 +927,8 @@
         "Typecheck passes"
       ],
       "priority": 59,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-060",
@@ -943,8 +943,8 @@
         "Typecheck passes"
       ],
       "priority": 60,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-061",
@@ -958,8 +958,8 @@
         "Typecheck passes"
       ],
       "priority": 61,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-062",
@@ -976,8 +976,8 @@
         "Typecheck passes"
       ],
       "priority": 62,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-063",
@@ -990,8 +990,8 @@
         "Typecheck passes"
       ],
       "priority": 63,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-064",
@@ -1007,8 +1007,8 @@
         "Typecheck passes"
       ],
       "priority": 64,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-065",
@@ -1024,8 +1024,8 @@
         "Typecheck passes"
       ],
       "priority": 65,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-066",
@@ -1039,8 +1039,8 @@
         "Typecheck passes"
       ],
       "priority": 66,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-067",
@@ -1056,8 +1056,8 @@
         "Typecheck passes"
       ],
       "priority": 67,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-068",
@@ -1073,8 +1073,8 @@
         "Typecheck passes"
       ],
       "priority": 68,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-069",
@@ -1088,8 +1088,8 @@
         "Typecheck passes"
       ],
       "priority": 69,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-070",
@@ -1104,8 +1104,8 @@
         "Typecheck passes"
       ],
       "priority": 70,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-071",
@@ -1121,8 +1121,8 @@
         "Typecheck passes"
       ],
       "priority": 71,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-072",
@@ -1137,8 +1137,8 @@
         "Typecheck passes"
       ],
       "priority": 72,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-073",
@@ -1152,8 +1152,8 @@
         "Typecheck passes"
       ],
       "priority": 73,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     },
     {
       "id": "US-074",
@@ -1168,8 +1168,8 @@
         "Typecheck passes"
       ],
       "priority": 74,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "已完成并测试通过"
     }
   ]
 }

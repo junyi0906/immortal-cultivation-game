@@ -346,6 +346,286 @@
       }
     }
 
+    /* ==================== 角色创建界面 ==================== */
+
+    .character-creation-screen {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .creation-container {
+      width: 900px;
+      max-width: 95%;
+      background: rgba(0, 0, 0, 0.85);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      border: 2px solid rgba(102, 126, 234, 0.3);
+    }
+
+    .creation-title {
+      font-size: 36px;
+      text-align: center;
+      margin-bottom: 30px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .creation-section {
+      margin-bottom: 30px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #f093fb;
+      border-bottom: 2px solid rgba(240, 147, 251, 0.3);
+      padding-bottom: 8px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #aaa;
+    }
+
+    .input-group input[type="text"] {
+      width: 100%;
+      padding: 15px;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      color: #fff;
+      transition: all 0.3s;
+    }
+
+    .input-group input[type="text"]:focus {
+      outline: none;
+      border-color: #667eea;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .error-message {
+      color: #f38181;
+      font-size: 14px;
+      margin-top: 5px;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .class-selection {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .class-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .class-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+
+    .class-card.selected {
+      border-color: #667eea;
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    .class-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+
+    .class-name {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .class-description {
+      font-size: 12px;
+      color: #aaa;
+      line-height: 1.5;
+    }
+
+    .class-stats {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .class-stats .stat {
+      display: flex;
+      justify-content: space-between;
+      margin: 5px 0;
+      font-size: 13px;
+      color: #4ecdc4;
+    }
+
+    .preview-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-top: 20px;
+    }
+
+    .character-preview {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 20px;
+    }
+
+    .preview-image {
+      width: 100%;
+      height: 200px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 80px;
+      margin-bottom: 20px;
+      transition: all 0.3s;
+    }
+
+    .preview-actions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .action-preview {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .action-preview:hover {
+      border-color: #667eea;
+    }
+
+    .action-preview.active {
+      border-color: #667eea;
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    .action-icon {
+      font-size: 32px;
+      margin-bottom: 5px;
+    }
+
+    .action-name {
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    .action-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+      display: none;
+      margin-top: 10px;
+    }
+
+    .action-preview.active .action-image {
+      display: block;
+    }
+
+    .character-info {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 20px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+
+    .info-label {
+      color: #aaa;
+    }
+
+    .info-value {
+      color: #4ecdc4;
+      font-weight: bold;
+    }
+
+    .creation-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .creation-actions .btn {
+      flex: 1;
+      padding: 15px 30px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .creation-actions .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .creation-actions .btn.primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+    }
+
+    .creation-actions .btn.primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .creation-actions .btn.secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .creation-actions .btn.secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
     /* ==================== 加载界面 ==================== */
     .loading-screen {
       position: absolute;
@@ -555,6 +835,125 @@
       </div>
       <div class="loading-text" id="loading-text">加载中...</div>
     </div>
+
+    <!-- 角色创建界面 -->
+    <div class="character-creation-screen" id="character-creation-screen" style="display: none;">
+      <div class="creation-container">
+        <h1 class="creation-title">角色创建</h1>
+
+        <div class="creation-section">
+          <div class="section-title">角色名字</div>
+          <div class="input-group">
+            <label for="character-name">输入你的名字</label>
+            <input type="text" id="character-name" placeholder="请输入角色名字（2-10个字符）" maxlength="10">
+            <div class="error-message" id="name-error">请输入有效的角色名字</div>
+          </div>
+        </div>
+
+        <div class="creation-section">
+          <div class="section-title">选择职业</div>
+          <div class="class-selection">
+            <div class="class-card" data-class="swordsman" onclick="selectClass('swordsman')">
+              <div class="class-icon">⚔️</div>
+              <div class="class-name">剑修</div>
+              <div class="class-description">以剑入道，攻守兼备，擅长近战攻击</div>
+              <div class="class-stats">
+                <div class="stat"><span>攻击</span><span>★★★★★</span></div>
+                <div class="stat"><span>防御</span><span>★★★★☆</span></div>
+                <div class="stat"><span>生命</span><span>★★★☆☆</span></div>
+              </div>
+            </div>
+
+            <div class="class-card" data-class="mage" onclick="selectClass('mage')">
+              <div class="class-icon">🔮</div>
+              <div class="class-name">法修</div>
+              <div class="class-description">法力无边，掌控元素，擅长远程法术</div>
+              <div class="class-stats">
+                <div class="stat"><span>攻击</span><span>★★★★☆</span></div>
+                <div class="stat"><span>防御</span><span>★★☆☆☆</span></div>
+                <div class="stat"><span>生命</span><span>★★★★☆</span></div>
+              </div>
+            </div>
+
+            <div class="class-card" data-class="warrior" onclick="selectClass('warrior')">
+              <div class="class-icon">💪</div>
+              <div class="class-name">体修</div>
+              <div class="class-description">肉身成圣，坚韧不拔，擅长持久战斗</div>
+              <div class="class-stats">
+                <div class="stat"><span>攻击</span><span>★★★☆☆</span></div>
+                <div class="stat"><span>防御</span><span>★★★★★</span></div>
+                <div class="stat"><span>生命</span><span>★★★★★</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="creation-section">
+          <div class="section-title">角色预览</div>
+          <div class="preview-section">
+            <div class="character-preview">
+              <div class="preview-image" id="main-preview">
+                <span id="preview-icon">⚔️</span>
+              </div>
+              <div class="preview-actions">
+                <div class="action-preview" data-action="idle" onclick="previewAction('idle')">
+                  <div class="action-icon">🧍</div>
+                  <div class="action-name">站立</div>
+                  <img class="action-image" id="idle-image">
+                </div>
+                <div class="action-preview" data-action="attack" onclick="previewAction('attack')">
+                  <div class="action-icon">⚔️</div>
+                  <div class="action-name">攻击</div>
+                  <img class="action-image" id="attack-image">
+                </div>
+                <div class="action-preview" data-action="injured" onclick="previewAction('injured')">
+                  <div class="action-icon">💥</div>
+                  <div class="action-name">受伤</div>
+                  <img class="action-image" id="injured-image">
+                </div>
+                <div class="action-preview" data-action="victory" onclick="previewAction('victory')">
+                  <div class="action-icon">🏆</div>
+                  <div class="action-name">胜利</div>
+                  <img class="action-image" id="victory-image">
+                </div>
+              </div>
+            </div>
+
+            <div class="character-info">
+              <div class="info-row">
+                <span class="info-label">名字:</span>
+                <span class="info-value" id="info-name">未命名</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">职业:</span>
+                <span class="info-value" id="info-class">未选择</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">攻击:</span>
+                <span class="info-value" id="info-attack">-</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">防御:</span>
+                <span class="info-value" id="info-defense">-</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">生命:</span>
+                <span class="info-value" id="info-hp">-</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">法力:</span>
+                <span class="info-value" id="info-mp">-</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="creation-actions">
+          <button class="btn secondary" onclick="goBack()">返回</button>
+          <button class="btn primary" id="create-btn" onclick="createCharacter()" disabled>创建角色</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script type="module">
@@ -565,13 +964,62 @@
     let canvas = null;
     let ctx = null;
 
+    // 角色创建相关变量
+    let currentName = '';
+    let currentClass = null;
+    let characterImages = {};
+    const classData = {
+      swordsman: {
+        name: '剑修',
+        icon: '⚔️',
+        baseAttack: 15,
+        baseDefense: 10,
+        baseHp: 100,
+        baseMp: 50
+      },
+      mage: {
+        name: '法修',
+        icon: '🔮',
+        baseAttack: 12,
+        baseDefense: 5,
+        baseHp: 80,
+        baseMp: 100
+      },
+      warrior: {
+        name: '体修',
+        icon: '💪',
+        baseAttack: 10,
+        baseDefense: 15,
+        baseHp: 120,
+        baseMp: 30
+      }
+    };
+
     // 初始化游戏
     async function initGame() {
       try {
+        // 检查是否有角色
+        const savedCharacter = localStorage.getItem('character');
+
+        if (!savedCharacter) {
+          // 没有角色，显示角色创建界面
+          document.getElementById('loading-screen').style.display = 'none';
+          document.getElementById('character-creation-screen').style.display = 'flex';
+          return;
+        }
+
+        // 有角色，加载角色数据
         showLoading('初始化游戏...', 10);
 
         // 初始化协调 Agent
         gameState = await coordinatorAPI.initGame();
+
+        // 加载角色数据
+        const character = JSON.parse(savedCharacter);
+        gameState.player = {
+          ...gameState.player,
+          ...character
+        };
 
         showLoading('加载资源...', 30);
 
@@ -603,6 +1051,136 @@
         showToast('初始化失败: ' + error.message);
       }
     }
+
+    // ==================== 角色创建相关函数 ====================
+
+    // 选择职业
+    window.selectClass = function(className) {
+      // 移除之前的选中状态
+      document.querySelectorAll('.class-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+
+      // 添加新的选中状态
+      document.querySelector(`[data-class="${className}"]`).classList.add('selected');
+
+      currentClass = className;
+      const classInfo = classData[className];
+
+      // 更新预览
+      document.getElementById('preview-icon').textContent = classInfo.icon;
+      document.getElementById('info-class').textContent = classInfo.name;
+      document.getElementById('info-attack').textContent = classInfo.baseAttack;
+      document.getElementById('info-defense').textContent = classInfo.baseDefense;
+      document.getElementById('info-hp').textContent = classInfo.baseHp;
+      document.getElementById('info-mp').textContent = classInfo.baseMp;
+
+      updateCreateButton();
+    };
+
+    // 输入名字
+    document.addEventListener('DOMContentLoaded', () => {
+      const nameInput = document.getElementById('character-name');
+      if (nameInput) {
+        nameInput.addEventListener('input', function(e) {
+          currentName = e.target.value.trim();
+          document.getElementById('info-name').textContent = currentName || '未命名';
+          updateCreateButton();
+        });
+      }
+    });
+
+    // 更新创建按钮状态
+    function updateCreateButton() {
+      const btn = document.getElementById('create-btn');
+      const nameError = document.getElementById('name-error');
+
+      // 验证名字
+      if (currentName.length < 2 || currentName.length > 10) {
+        nameError.classList.add('show');
+        btn.disabled = true;
+        return;
+      } else {
+        nameError.classList.remove('show');
+      }
+
+      // 验证职业
+      if (!currentClass) {
+        btn.disabled = true;
+        return;
+      }
+
+      btn.disabled = false;
+    }
+
+    // 预览动作
+    window.previewAction = function(action) {
+      // 移除之前的选中状态
+      document.querySelectorAll('.action-preview').forEach(card => {
+        card.classList.remove('active');
+      });
+
+      // 添加新的选中状态
+      document.querySelector(`[data-action="${action}"]`).classList.add('active');
+
+      // 更新主预览
+      const mainPreview = document.getElementById('main-preview');
+      const previewIcon = document.getElementById('preview-icon');
+
+      if (characterImages[action]) {
+        mainPreview.innerHTML = `<img src="${characterImages[action]}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">`;
+      } else {
+        mainPreview.innerHTML = `<span>${previewIcon.textContent}</span>`;
+      }
+    };
+
+    // 创建角色
+    window.createCharacter = async function() {
+      try {
+        const classInfo = classData[currentClass];
+
+        // 生成角色数据
+        const character = {
+          name: currentName,
+          class: currentClass,
+          className: classInfo.name,
+          icon: classInfo.icon,
+          baseAttack: classInfo.baseAttack,
+          baseDefense: classInfo.baseDefense,
+          baseHp: classInfo.baseHp,
+          baseMp: classInfo.baseMp,
+          level: 1,
+          exp: 0,
+          expToLevel: 100,
+          hp: classInfo.baseHp,
+          maxHp: classInfo.baseHp,
+          mp: classInfo.baseMp,
+          maxMp: classInfo.baseMp,
+          attack: classInfo.baseAttack,
+          defense: classInfo.baseDefense,
+          gold: 100,
+          images: characterImages,
+          createdAt: new Date().toISOString()
+        };
+
+        // 保存角色数据
+        localStorage.setItem('character', JSON.stringify(character));
+
+        // 隐藏角色创建界面
+        document.getElementById('character-creation-screen').style.display = 'none';
+
+        // 重新初始化游戏
+        await initGame();
+      } catch (error) {
+        console.error('创建角色失败:', error);
+        alert('创建角色失败: ' + error.message);
+      }
+    };
+
+    // 返回
+    window.goBack = function() {
+      window.location.href = 'character-creation.html';
+    };
 
     // 调整画布大小
     function resizeCanvas() {

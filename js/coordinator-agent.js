@@ -27,7 +27,8 @@ export function initGameState() {
       maxHp: 100,
       attack: 10,
       defense: 5,
-      gold: 0
+      gold: 0,
+      position: { x: 400, y: 300 } // 默认位置
     },
     currentMap: "village",
     inventory: [],
@@ -38,7 +39,8 @@ export function initGameState() {
       armor: null,
       accessory: null
     },
-    lastSaveTime: null
+    lastSaveTime: null,
+    gamePhase: "character-creation" // 游戏阶段：character-creation（角色创建） / playing（游戏中）
   };
 }
 
