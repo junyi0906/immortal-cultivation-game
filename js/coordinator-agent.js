@@ -25,6 +25,8 @@ export function initGameState() {
       expToNextLevel: 100,
       hp: 100,
       maxHp: 100,
+      mp: 50,
+      maxMp: 50,
       attack: 10,
       defense: 5,
       gold: 0,
@@ -40,7 +42,8 @@ export function initGameState() {
       accessory: null
     },
     lastSaveTime: null,
-    gamePhase: "character-creation" // 游戏阶段：character-creation（角色创建） / playing（游戏中）
+    gamePhase: "character-creation", // 游戏阶段：character-creation（角色创建） / playing（游戏中） / battle（战斗中） / dialog（对话中）
+    battleState: null // 战斗状态
   };
 }
 
@@ -165,9 +168,8 @@ async function handlePlayerMove(payload, gameState) {
     throw new Error("Invalid position coordinates");
   }
 
-  if (x < 0 || x > 512 || y < 0 || y > 512) {
-    throw new Error("Position out of bounds");
-  }
+  // 不再使用固定边界，允许玩家在画布任意位置移动
+  // 边界检查在 UI 层面进行
 
   // 更新玩家位置
   const updatedState = updateGameState(gameState, {
