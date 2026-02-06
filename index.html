@@ -959,7 +959,7 @@
   <script type="module">
     import coordinatorAPI from './js/coordinator-api.js';
     import { MAP_DATA } from './js/map-system.js';
-    import { NPC_DATA } from './js/npc-agent.js';
+    import { NPC_DATA, TASK_DATA } from './js/npc-agent.js';
     import { MONSTER_DATA } from './js/battle-agent.js';
 
     // 全局变量
@@ -1398,8 +1398,13 @@
 
     // 渲染对话框
     function renderDialog() {
+      if (!gameState || !gameState.currentNPC) return;
+
+      const npcData = NPC_DATA[gameState.currentNPC];
+      if (!npcData) return;
+
       // 对话框背景
-      const dialogHeight = 200;
+      const dialogHeight = 250;
       const dialogY = canvas.height - dialogHeight;
 
       ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
@@ -1413,14 +1418,61 @@
       ctx.fillStyle = '#f093fb';
       ctx.font = 'bold 20px Microsoft YaHei';
       ctx.textAlign = 'left';
-      ctx.fillText('NPC 名字', 70, dialogY + 35);
+      ctx.fillText(npcData.name, 70, dialogY + 35);
 
       // 对话内容
+      const currentDialogue = gameState.dialogQueue && gameState.dialogQueue[0];
+      const dialogueText = currentDialogue ? currentDialogue.text : '...';
+
       ctx.fillStyle = '#fff';
       ctx.font = '16px Microsoft YaHei';
-      ctx.fillText('对话内容...', 70, dialogY + 80);
 
-      // TODO: 渲染对话选项
+      // 自动换行
+      const maxWidth = canvas.width - 140;
+      const words = dialogueText.split('');
+      let line = '';
+      let y = dialogY + 80;
+      for (const word of words) {
+        const testLine = line + word;
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && line !== '') {
+          ctx.fillText(line, 70, y);
+          line = word;
+          y += 25;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, 70, y);
+
+      // 渲染对话选项
+      if (currentDialogue && currentDialogue.options) {
+        const options = currentDialogue.options;
+        ctx.font = '14px Microsoft YaHei';
+        let optionY = dialogY + 140;
+
+        for (let i = 0; i < options.length; i++) {
+          const option = options[i];
+          ctx.fillStyle = '#4ecdc4';
+          ctx.fillText(`${i + 1}. ${option.text}`, 70, optionY);
+          optionY += 30;
+        }
+
+        // 提示
+        ctx.fillStyle = '#aaa';
+        ctx.font = '12px Microsoft YaHei';
+        ctx.fillText('按 1-' + options.length + ' 选择对话选项', 70, dialogY + dialogHeight - 40);
+      } else if (gameState.dialogQueue && gameState.dialogQueue.length > 1) {
+        // 没有选项，显示"继续"
+        ctx.fillStyle = '#aaa';
+        ctx.font = '12px Microsoft YaHei';
+        ctx.fillText('按空格键继续对话', 70, dialogY + dialogHeight - 40);
+      } else {
+        // 对话结束，显示"离开"
+        ctx.fillStyle = '#aaa';
+        ctx.font = '12px Microsoft YaHei';
+        ctx.fillText('按空格键离开对话', 70, dialogY + dialogHeight - 40);
+      }
     }
 
     // 更新 UI
@@ -1748,6 +1800,141 @@
 
     // 窗口大小改变
     window.addEventListener('resize', resizeCanvas);
+
+    // 键盘事件处理
+    window.addEventListener('keydown', (e) => {
+      if (!gameState) return;
+
+      // 对话阶段的键盘处理
+      if (gameState.gamePhase === 'dialog') {
+        const currentDialogue = gameState.dialogQueue && gameState.dialogQueue[0];
+
+        // 如果有对话选项
+        if (currentDialogue && currentDialogue.options) {
+          const options = currentDialogue.options;
+          const key = e.key;
+
+          // 检查是否按下 1-9
+          const optionIndex = parseInt(key) - 1;
+          if (optionIndex >= 0 && optionIndex < options.length) {
+            // 选择对话选项
+            const selectedOption = options[optionIndex];
+            handleDialogueOption(selectedOption);
+          }
+        } else {
+          // 没有选项，按空格继续或离开
+          if (e.key === ' ') {
+            if (gameState.dialogQueue && gameState.dialogQueue.length > 1) {
+              // 继续下一条对话
+              gameState.dialogQueue.shift();
+            } else {
+              // 对话结束，离开对话
+              endDialogue();
+            }
+          }
+        }
+      }
+
+      // 战斗阶段的键盘处理
+      if (gameState.gamePhase === 'battle') {
+        // TODO: 添加战斗键盘处理
+        // 1：普通攻击
+        // 2-5：技能
+        // Space：逃跑
+      }
+    });
+
+    // 处理对话选项
+    function handleDialogueOption(option) {
+      if (!option) return;
+
+      // 执行选项的动作
+      if (option.action) {
+        switch (option.action) {
+          case 'acceptTask':
+            // 接受任务
+            if (option.taskId) {
+              const taskData = TASK_DATA[option.taskId];
+              if (taskData) {
+                // 添加任务到玩家任务列表
+                if (!gameState.tasks) gameState.tasks = [];
+                gameState.tasks.push({
+                  id: option.taskId,
+                  title: taskData.title,
+                  description: taskData.description,
+                  progress: 0,
+                  completed: false
+                });
+                showToast('接受任务：' + taskData.title);
+              }
+            }
+            break;
+
+          case 'completeTask':
+            // 完成任务
+            if (option.taskId) {
+              const taskIndex = gameState.tasks.findIndex(t => t.id === option.taskId);
+              if (taskIndex !== -1) {
+                const task = gameState.tasks[taskIndex];
+                const taskData = TASK_DATA[option.taskId];
+
+                if (taskData && taskData.rewards) {
+                  // 发放奖励
+                  gameState.player.exp += taskData.rewards.exp || 0;
+                  gameState.player.gold += taskData.rewards.gold || 0;
+
+                  // 检查升级
+                  if (gameState.player.exp >= gameState.player.expToNextLevel) {
+                    gameState.player.level++;
+                    gameState.player.exp -= gameState.player.expToNextLevel;
+                    gameState.player.expToNextLevel = Math.floor(gameState.player.expToNextLevel * 1.5);
+                    gameState.player.maxHp += 10;
+                    gameState.player.hp = gameState.player.maxHp;
+                    gameState.player.attack += 2;
+                    gameState.player.defense += 1;
+                    showToast(`升级了！现在是 ${gameState.player.level} 级`);
+                  }
+
+                  // 标记任务完成
+                  task.completed = true;
+                  showToast('任务完成！');
+                }
+              }
+            }
+            break;
+
+          case 'shop':
+            // 打开商店
+            // TODO: 实现商店界面
+            showToast('商店功能开发中...');
+            break;
+
+          case 'end':
+            // 结束对话
+            endDialogue();
+            break;
+        }
+      }
+
+      // 如果有下一条对话，继续
+      if (option.nextDialogueId && gameState.dialogQueue) {
+        // TODO: 根据 nextDialogueId 加载下一条对话
+      } else if (gameState.dialogQueue && gameState.dialogQueue.length > 1) {
+        // 继续下一条对话
+        gameState.dialogQueue.shift();
+      } else {
+        // 对话结束，离开对话
+        endDialogue();
+      }
+    }
+
+    // 结束对话
+    function endDialogue() {
+      gameState.gamePhase = 'playing';
+      gameState.currentNPC = null;
+      gameState.dialogQueue = null;
+      updateUI();
+    }
 
     // 初始化游戏
     window.addEventListener('load', initGame);
