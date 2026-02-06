@@ -2157,6 +2157,31 @@
       }
     }
 
+    // 检查并解锁地图
+    function checkAndUnlockMaps() {
+      if (!gameState || !gameState.player) return;
+
+      const player = gameState.player;
+      let unlockedMaps = [];
+
+      // 检查每个地图
+      for (const mapId in MAP_DATA) {
+        const map = MAP_DATA[mapId];
+
+        // 如果地图未解锁且玩家等级达到要求
+        if (!map.unlocked && player.level >= map.minLevel) {
+          // 解锁地图
+          map.unlocked = true;
+          unlockedMaps.push(map.name);
+        }
+      }
+
+      // 如果有解锁的地图，显示提示
+      if (unlockedMaps.length > 0) {
+        showToast(`解锁新地图：${unlockedMaps.join('、')}！`);
+      }
+    }
+
     // 战斗胜利
     function battleWin() {
       if (!gameState || !gameState.battleState) return;
@@ -2180,7 +2205,13 @@
         player.hp = player.maxHp;
         player.attack += 2;
         player.defense += 1;
+        player.maxMp += 5; // 增加最大法力值
+        player.mp = player.maxMp; // 恢复满法力
+
         showToast(`战斗胜利！升级了！现在是 ${player.level} 级`);
+
+        // 检查并解锁地图
+        checkAndUnlockMaps();
       } else {
         showToast(`战斗胜利！获得 ${expReward} 经验和 ${goldReward} 金币`);
       }
@@ -2262,7 +2293,13 @@
                     gameState.player.hp = gameState.player.maxHp;
                     gameState.player.attack += 2;
                     gameState.player.defense += 1;
+                    gameState.player.maxMp += 5; // 增加最大法力值
+                    gameState.player.mp = gameState.player.maxMp; // 恢复满法力
+
                     showToast(`升级了！现在是 ${gameState.player.level} 级`);
+
+                    // 检查并解锁地图
+                    checkAndUnlockMaps();
                   }
 
                   // 标记任务完成
